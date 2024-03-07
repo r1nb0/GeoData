@@ -6,7 +6,7 @@
 2. Реализовать CRUD-операции со всеми сущностями.
 ## Архитектура приложения
 
-![Image alt](https://github.com/{r1nb0}/{GeoData}/raw/{master}/base_diagram.jpg)
+![Image alt](https://github.com/r1nb0/GeoData/raw/master/base_diagram.jpg)
 
 ## Запуск
 1. **Подключение к базе данных**: Для функциональности и работы проекта необходимо подключиться к базе данных PostgreSQL 16. Разверните Docker контейнер с PostgreSQL и укажите параметры подключения в файле application.properties, а именно: `url`, `username`, `password`.
