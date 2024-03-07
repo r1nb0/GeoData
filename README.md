@@ -4,7 +4,7 @@
 ## Задание 2
 1. Подключить в проект БД (PostgreSQL/MySQL/и т.д.).
 2. Реализовать CRUD-операции со всеми сущностями.
-## Архитектура приложения
+## Cтруктура БД
 
 ![Image alt](https://github.com/r1nb0/GeoData/raw/master/base_diagram.jpg)
 
