@@ -34,8 +34,7 @@ public class LanguageController {
 
     @DeleteMapping("/delete/{nameLanguage}")
     HttpStatus deleteLanguage(@PathVariable String nameLanguage){
-        Boolean isExist = languageService.deleteByName(nameLanguage);
-        if (isExist){
+        if (languageService.deleteByName(nameLanguage)){
             return HttpStatus.OK;
         }else{
             return HttpStatus.BAD_REQUEST;

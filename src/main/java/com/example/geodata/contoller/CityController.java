@@ -39,8 +39,7 @@ public class CityController {
 
     @DeleteMapping("/delete/{nameCity}")
     public HttpStatus deleteCityByName(@PathVariable String nameCity){
-       Boolean isExist =  cityService.deleteByName(nameCity);
-       if (isExist) {
+       if (cityService.deleteByName(nameCity)) {
            return HttpStatus.OK;
        }else{
            return HttpStatus.BAD_REQUEST;
