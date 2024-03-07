@@ -15,6 +15,6 @@ public interface LanguageRepository extends JpaRepository<Language, Integer> {
     @Query(value = "SELECT * FROM languages obj where obj.language_name in (?1)", nativeQuery = true)
     List<Language> findByNames(@Param("1") List<String> names);
 
-    Optional<Language> findByNameLanguage(String name);
+    Optional<Language> findByName(String name);
 
 }

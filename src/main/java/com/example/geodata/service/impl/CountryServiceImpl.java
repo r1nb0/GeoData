@@ -34,7 +34,7 @@ public class CountryServiceImpl implements CountryService {
     public Country addCountryWithExistingLanguages(CountryDTO countryDTO) {
         List<Language> languages = languageRepository.findByNames(countryDTO.getLanguages());
         Country country = Country.builder()
-                .name(countryDTO.getNameCountry())
+                .name(countryDTO.getName())
                 .nationality(countryDTO.getNationality())
                 .latitude(countryDTO.getLatitude())
                 .longitude(countryDTO.getLongitude())

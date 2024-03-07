@@ -1,6 +1,7 @@
 package com.example.geodata.contoller;
 
 import com.example.geodata.entity.Language;
+import com.example.geodata.entity.dto.LanguageDTO;
 import com.example.geodata.service.LanguageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,8 +29,8 @@ public class LanguageController {
     }
 
     @PostMapping("/create")
-    ResponseEntity<Language> addLanguage(@RequestBody Language language){
-        return new ResponseEntity<>(languageService.save(language), HttpStatus.OK);
+    ResponseEntity<Language> addLanguage(@RequestBody LanguageDTO languageDTO){
+        return new ResponseEntity<>(languageService.save(languageDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{nameLanguage}")

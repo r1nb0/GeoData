@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class CountryDTO {
 
-    private String nameCountry;
+    private String name;
 
     private String nationality;
 
