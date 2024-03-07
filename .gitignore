@@ -38,5 +38,5 @@ out/
 
 gradlew.bat
 gradlew
-/gradle/wrapper
+gradle/wrapper/
 settings.gradle
