@@ -1,6 +1,7 @@
 package com.example.geodata.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,7 +24,7 @@ public class City {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "fk_cities_countries")
-    @JsonBackReference
+    @JsonIgnore
     private Country country;
 
     @Column(name = "latitude")

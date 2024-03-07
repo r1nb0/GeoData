@@ -36,7 +36,17 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public Language update(Language language) {
-        return languageRepository.save(language);
+        Optional<Language> languageExist = languageRepository.findById(language.getId());
+        if (languageExist.isPresent()){
+            if (language.getCode() != null){
+                languageExist.get().setCode(language.getCode());
+            }
+            if (language.getName() != null){
+                languageExist.get().setName(language.getName());
+            }
+            return languageRepository.save(languageExist.get());
+        }
+        return null;
     }
 
     @Override

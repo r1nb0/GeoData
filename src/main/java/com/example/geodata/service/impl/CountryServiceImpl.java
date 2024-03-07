@@ -60,7 +60,23 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Country update(Country country) {
-        return countryRepository.save(country);
+        Optional<Country> countryExist = countryRepository.findById(country.getId());
+        if (countryExist.isPresent()){
+            if (country.getLongitude() != null){
+                countryExist.get().setLongitude(country.getLongitude());
+            }
+            if (country.getLatitude() != null){
+                countryExist.get().setLatitude(country.getLatitude());
+            }
+            if (country.getNationality() != null){
+                countryExist.get().setNationality(country.getNationality());
+            }
+            if (country.getName() != null){
+                countryExist.get().setName(country.getName());
+            }
+            return countryRepository.save(countryExist.get());
+        }
+        return null;
     }
 
 }

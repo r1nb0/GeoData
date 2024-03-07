@@ -56,7 +56,19 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public City update(City city) {
-        return cityRepository.save(city);
+        Optional<City> cityExist = cityRepository.findById(city.getId());
+        if (cityExist.isPresent()){
+            if (city.getLatitude() != null){
+                cityExist.get().setLatitude(city.getLatitude());
+            }
+            if (city.getLongitude() != null){
+                cityExist.get().setLongitude(city.getLongitude());
+            }
+            if (city.getName() != null){
+                cityExist.get().setName(city.getName());
+            }
+            return cityRepository.save(cityExist.get());
+        }
+        return null;
     }
-
 }
