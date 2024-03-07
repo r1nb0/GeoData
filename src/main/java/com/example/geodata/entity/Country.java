@@ -13,8 +13,9 @@ import java.util.Set;
 @Table(name = "countries")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
-@Data
 public class Country {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
