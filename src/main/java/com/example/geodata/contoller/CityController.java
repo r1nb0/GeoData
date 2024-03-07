@@ -39,11 +39,12 @@ public class CityController {
 
     @DeleteMapping("/delete/{nameCity}")
     public HttpStatus deleteCityByName(@PathVariable String nameCity){
-       if (cityService.deleteByName(nameCity)) {
-           return HttpStatus.OK;
-       }else{
-           return HttpStatus.BAD_REQUEST;
-       }
+        Boolean isExist = cityService.deleteByName(nameCity);
+        if (Boolean.TRUE.equals(isExist)) {
+            return HttpStatus.OK;
+        }else{
+            return HttpStatus.BAD_REQUEST;
+        }
     }
 
     @PutMapping("/update")

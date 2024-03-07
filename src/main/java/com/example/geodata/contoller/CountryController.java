@@ -40,7 +40,8 @@ public class CountryController {
 
     @DeleteMapping("/delete/{nameCountry}")
     public HttpStatus deleteCountryByName(@PathVariable String nameCountry){
-        if (countryService.deleteCountryByName(nameCountry)){
+        Boolean isExist = countryService.deleteCountryByName(nameCountry);
+        if (Boolean.TRUE.equals(isExist)){
             return HttpStatus.OK;
         }else{
             return HttpStatus.BAD_REQUEST;
