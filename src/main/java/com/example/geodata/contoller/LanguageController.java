@@ -23,7 +23,7 @@ public class LanguageController {
         return new ResponseEntity<>(languageService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/find/{languageName}")
+    @GetMapping("/info/{languageName}")
     Optional<Language> getByName(@PathVariable String languageName){
         return languageService.findByName(languageName);
     }
@@ -43,9 +43,13 @@ public class LanguageController {
         }
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update_info")
     ResponseEntity<Language> updateInfo(@RequestBody LanguageDTO languageDTO){
-        return new ResponseEntity<>(languageService.update(languageDTO), HttpStatus.OK);
+        Language language = languageService.update(languageDTO);
+        if (language == null){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(language, HttpStatus.OK);
     }
 
 }

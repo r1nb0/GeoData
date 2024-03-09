@@ -48,14 +48,31 @@ public class CountryController {
         }
     }
 
-    @PutMapping("/update_add")
+    @PutMapping("update_info")
     public ResponseEntity<Country> updateInfo(@RequestBody CountryDTO countryDTO){
-        return new ResponseEntity<>(countryService.update(countryDTO), HttpStatus.OK);
+        Country updateCountry = countryService.updateInfo(countryDTO);
+        if (updateCountry == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(updateCountry, HttpStatus.OK);
     }
 
-    @PutMapping("/update_delete")
-    public ResponseEntity<Country> deleteLanguage(@RequestBody CountryDTO countryDTO){
-        return new ResponseEntity<>(countryService.deleteLanguage(countryDTO), HttpStatus.OK);
+    @PutMapping("/add_languages")
+    public ResponseEntity<Country> addLanguages(@RequestBody CountryDTO countryDTO){
+        Country updateCountry = countryService.addLanguage(countryDTO);
+        if (updateCountry == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(updateCountry, HttpStatus.OK);
+    }
+
+    @PutMapping("/delete_languages")
+    public ResponseEntity<Country> deleteLanguages(@RequestBody CountryDTO countryDTO){
+        Country updateCountry = countryService.deleteLanguage(countryDTO);
+        if (updateCountry == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(updateCountry, HttpStatus.OK);
     }
 
     @GetMapping("/distance/{firstCountry}+{secondCountry}")
@@ -73,7 +90,5 @@ public class CountryController {
         objects.put("Distance", distance.toString() + "km");
         return new ResponseEntity<>(objects, HttpStatus.OK);
     }
-
-
 
 }

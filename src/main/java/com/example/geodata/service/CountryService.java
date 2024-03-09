@@ -20,6 +20,8 @@ public interface CountryService {
 
     Country deleteLanguage(CountryDTO countryDTO);
 
-    Country update(CountryDTO countryDTO);
+    Country addLanguage(CountryDTO countryDTO);
+
+    Country updateInfo(CountryDTO countryDTO);
 
 }

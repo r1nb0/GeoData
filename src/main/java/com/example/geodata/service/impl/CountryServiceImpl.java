@@ -59,21 +59,9 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Country update(CountryDTO countryDTO) {
+    public Country addLanguage(CountryDTO countryDTO) {
         Optional<Country> countryExist = countryRepository.findById(countryDTO.getId());
         if (countryExist.isPresent()){
-            if (countryDTO.getLongitude() != null){
-                countryExist.get().setLongitude(countryDTO.getLongitude());
-            }
-            if (countryDTO.getLatitude() != null){
-                countryExist.get().setLatitude(countryDTO.getLatitude());
-            }
-            if (countryDTO.getNationality() != null){
-                countryExist.get().setNationality(countryDTO.getNationality());
-            }
-            if (countryDTO.getName() != null){
-                countryExist.get().setName(countryDTO.getName());
-            }
             List<Language> languageExist = languageRepository.findByNames(countryDTO.getLanguages());
                 for (Language language : languageExist){
                     countryExist.get().addLanguage(language);
@@ -83,6 +71,28 @@ public class CountryServiceImpl implements CountryService {
         return null;
     }
 
+    @Override
+    public Country updateInfo(CountryDTO countryDTO) {
+        Optional<Country> countryExist = countryRepository.findById(countryDTO.getId());
+        if (countryExist.isPresent()) {
+            if (countryDTO.getLongitude() != null) {
+                countryExist.get().setLongitude(countryDTO.getLongitude());
+            }
+            if (countryDTO.getLatitude() != null) {
+                countryExist.get().setLatitude(countryDTO.getLatitude());
+            }
+            if (countryDTO.getNationality() != null) {
+                countryExist.get().setNationality(countryDTO.getNationality());
+            }
+            if (countryDTO.getName() != null) {
+                countryExist.get().setName(countryDTO.getName());
+            }
+            return countryRepository.save(countryExist.get());
+        }
+        return null;
+    }
+
+    @Override
     public Country deleteLanguage(CountryDTO countryDTO){
         List<Language> languages = languageRepository.findByNames(countryDTO.getLanguages());
         Optional<Country> country = countryRepository.findById(countryDTO.getId());
