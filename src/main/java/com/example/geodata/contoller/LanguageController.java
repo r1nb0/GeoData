@@ -44,8 +44,8 @@ public class LanguageController {
     }
 
     @PutMapping("/update")
-    ResponseEntity<Language> updateInfo(@RequestBody Language language){
-        return new ResponseEntity<>(languageService.update(language), HttpStatus.OK);
+    ResponseEntity<Language> updateInfo(@RequestBody LanguageDTO languageDTO){
+        return new ResponseEntity<>(languageService.update(languageDTO), HttpStatus.OK);
     }
 
 }

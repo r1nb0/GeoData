@@ -18,6 +18,6 @@ public interface CityService {
 
     City addCityWithExistingCountry(CityDTO cityDTO);
 
-    City update(City city);
+    City update(CityDTO cityDTO);
 
 }

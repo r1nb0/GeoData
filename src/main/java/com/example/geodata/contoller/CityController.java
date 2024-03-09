@@ -48,8 +48,8 @@ public class CityController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<City> updateInfo(@RequestBody City city){
-        return new ResponseEntity<>(cityService.update(city), HttpStatus.OK);
+    public ResponseEntity<City> updateInfo(@RequestBody CityDTO cityDTO){
+        return new ResponseEntity<>(cityService.update(cityDTO), HttpStatus.OK);
     }
 
     @GetMapping("/distance/{firstCity}+{secondCity}")

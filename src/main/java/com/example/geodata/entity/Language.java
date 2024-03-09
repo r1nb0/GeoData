@@ -1,6 +1,6 @@
 package com.example.geodata.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +26,7 @@ public class Language {
     private String code;
 
     @ManyToMany(mappedBy = "languages", cascade = { CascadeType.MERGE, CascadeType.PERSIST }, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonBackReference
     List<Country> countries = new ArrayList<>();
 
 }

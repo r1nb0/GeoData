@@ -14,7 +14,7 @@ public interface LanguageService {
 
     Language save(LanguageDTO language);
 
-    Language update(Language language);
+    Language update(LanguageDTO languageDTO);
 
     Boolean deleteByName(String name);
 

@@ -35,14 +35,14 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
-    public Language update(Language language) {
-        Optional<Language> languageExist = languageRepository.findById(language.getId());
+    public Language update(LanguageDTO languageDTO) {
+        Optional<Language> languageExist = languageRepository.findById(languageDTO.getId());
         if (languageExist.isPresent()){
-            if (language.getCode() != null){
-                languageExist.get().setCode(language.getCode());
+            if (languageDTO.getCode() != null){
+                languageExist.get().setCode(languageDTO.getCode());
             }
-            if (language.getName() != null){
-                languageExist.get().setName(language.getName());
+            if (languageDTO.getName() != null){
+                languageExist.get().setName(languageDTO.getName());
             }
             return languageRepository.save(languageExist.get());
         }
@@ -66,5 +66,4 @@ public class LanguageServiceImpl implements LanguageService {
     public Optional<Language> findByName(String name) {
         return languageRepository.findByName(name);
     }
-
 }

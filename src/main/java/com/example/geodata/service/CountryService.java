@@ -18,6 +18,8 @@ public interface CountryService {
 
     Boolean deleteCountryByName(String name);
 
-    Country update(Country country);
+    Country deleteLanguage(CountryDTO countryDTO);
+
+    Country update(CountryDTO countryDTO);
 
 }

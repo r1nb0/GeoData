@@ -48,9 +48,14 @@ public class CountryController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Country> updateInfo(@RequestBody Country country){
-        return new ResponseEntity<>(countryService.update(country), HttpStatus.OK);
+    @PutMapping("/update_add")
+    public ResponseEntity<Country> updateInfo(@RequestBody CountryDTO countryDTO){
+        return new ResponseEntity<>(countryService.update(countryDTO), HttpStatus.OK);
+    }
+
+    @PutMapping("/update_delete")
+    public ResponseEntity<Country> deleteLanguage(@RequestBody CountryDTO countryDTO){
+        return new ResponseEntity<>(countryService.deleteLanguage(countryDTO), HttpStatus.OK);
     }
 
     @GetMapping("/distance/{firstCountry}+{secondCountry}")
@@ -68,5 +73,7 @@ public class CountryController {
         objects.put("Distance", distance.toString() + "km");
         return new ResponseEntity<>(objects, HttpStatus.OK);
     }
+
+
 
 }

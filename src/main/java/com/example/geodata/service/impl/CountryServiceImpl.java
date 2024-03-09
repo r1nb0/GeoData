@@ -59,24 +59,39 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Country update(Country country) {
-        Optional<Country> countryExist = countryRepository.findById(country.getId());
+    public Country update(CountryDTO countryDTO) {
+        Optional<Country> countryExist = countryRepository.findById(countryDTO.getId());
         if (countryExist.isPresent()){
-            if (country.getLongitude() != null){
-                countryExist.get().setLongitude(country.getLongitude());
+            if (countryDTO.getLongitude() != null){
+                countryExist.get().setLongitude(countryDTO.getLongitude());
             }
-            if (country.getLatitude() != null){
-                countryExist.get().setLatitude(country.getLatitude());
+            if (countryDTO.getLatitude() != null){
+                countryExist.get().setLatitude(countryDTO.getLatitude());
             }
-            if (country.getNationality() != null){
-                countryExist.get().setNationality(country.getNationality());
+            if (countryDTO.getNationality() != null){
+                countryExist.get().setNationality(countryDTO.getNationality());
             }
-            if (country.getName() != null){
-                countryExist.get().setName(country.getName());
+            if (countryDTO.getName() != null){
+                countryExist.get().setName(countryDTO.getName());
             }
+            List<Language> languageExist = languageRepository.findByNames(countryDTO.getLanguages());
+                for (Language language : languageExist){
+                    countryExist.get().addLanguage(language);
+                }
             return countryRepository.save(countryExist.get());
         }
         return null;
     }
 
+    public Country deleteLanguage(CountryDTO countryDTO){
+        List<Language> languages = languageRepository.findByNames(countryDTO.getLanguages());
+        Optional<Country> country = countryRepository.findById(countryDTO.getId());
+        if (country.isPresent()) {
+            for (Language language : languages) {
+                country.get().removeLanguage(language);
+            }
+            return countryRepository.save(country.get());
+        }
+        return null;
+    }
 }
