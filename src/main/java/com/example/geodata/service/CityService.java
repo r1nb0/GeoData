@@ -12,11 +12,13 @@ public interface CityService {
 
     List<City> getAll();
 
-    Optional<City> findByName(String name);
+    Boolean deleteById(Integer id);
 
-    Boolean deleteByName(String name);
+    Optional<City> findById(Integer id);
 
     City addCityWithExistingCountry(CityDTO cityDTO);
+
+    City replaceCountry(CityDTO cityDTO);
 
     City update(CityDTO cityDTO);
 

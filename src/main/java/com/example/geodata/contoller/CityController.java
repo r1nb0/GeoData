@@ -27,24 +27,37 @@ public class CityController {
         return cityService.getAll();
     }
 
-    @GetMapping("/info/{nameCity}")
-    public Optional<City> findByName(@PathVariable String nameCity){
-        return cityService.findByName(nameCity);
+    @GetMapping("/info/{cityId}")
+    public Optional<City> findByName(@PathVariable Integer cityId){
+        return cityService.findById(cityId);
     }
 
     @PostMapping("/create")
     public ResponseEntity<City> addCity(@RequestBody CityDTO cityDTO){
-        return new ResponseEntity<>(cityService.addCityWithExistingCountry(cityDTO), HttpStatus.OK);
+        City existCity = cityService.addCityWithExistingCountry(cityDTO);
+        if (existCity == null){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(existCity, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{nameCity}")
-    public HttpStatus deleteCityByName(@PathVariable String nameCity){
-        Boolean isExist = cityService.deleteByName(nameCity);
+    @DeleteMapping("/delete/{cityId}")
+    public HttpStatus deleteCityByName(@PathVariable Integer cityId){
+        Boolean isExist = cityService.deleteById(cityId);
         if (Boolean.TRUE.equals(isExist)) {
             return HttpStatus.OK;
         }else{
             return HttpStatus.BAD_REQUEST;
         }
+    }
+
+    @PutMapping("/change_country")
+    public ResponseEntity<City> changeCountry(@RequestBody CityDTO cityDTO){
+        City city = cityService.replaceCountry(cityDTO);
+        if (city == null){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(city, HttpStatus.OK);
     }
 
     @PutMapping("/update_info")
@@ -56,16 +69,16 @@ public class CityController {
         return new ResponseEntity<>(city, HttpStatus.OK);
     }
 
-    @GetMapping("/distance/{firstCity}+{secondCity}")
-    public ResponseEntity<Object> distance(@PathVariable String firstCity, @PathVariable String secondCity){
-        Optional<City> first = cityService.findByName(firstCity);
-        Optional<City> second = cityService.findByName(secondCity);
+    @GetMapping("/distance/{firstCityId}+{secondCityId}")
+    public ResponseEntity<Object> distance(@PathVariable Integer firstCityId, @PathVariable Integer secondCityId){
+        Optional<City> first = cityService.findById(firstCityId);
+        Optional<City> second = cityService.findById(secondCityId);
         if (first.isEmpty() || second.isEmpty())
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objects = objectMapper.createObjectNode();
-        objects.put("First city", firstCity);
-        objects.put("Second city", secondCity);
+        objects.put("First city", first.get().getName());
+        objects.put("Second city", second.get().getName());
         Double distance = distanceService.calculateDistance(first.get().getLatitude(), second.get().getLongitude(),
                 second.get().getLatitude(), second.get().getLongitude());
         objects.put("Distance", distance.toString() + "km");

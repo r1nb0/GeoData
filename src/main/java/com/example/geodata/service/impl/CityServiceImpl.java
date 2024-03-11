@@ -25,18 +25,18 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public Optional<City> findByName(String name) {
-        return cityRepository.findCityByName(name);
-    }
-
-    @Override
-    public Boolean deleteByName(String name) {
-        Optional<City> city = cityRepository.findCityByName(name);
+    public Boolean deleteById(Integer id) {
+        Optional<City> city = cityRepository.findById(id);
         if (city.isPresent()){
             cityRepository.delete(city.get());
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Optional<City> findById(Integer id) {
+        return cityRepository.findById(id);
     }
 
     @Override
@@ -50,6 +50,18 @@ public class CityServiceImpl implements CityService {
                     .country(country.get())
                     .build();
             return cityRepository.save(city);
+        }
+        return null;
+    }
+
+    @Override
+    public City replaceCountry(CityDTO cityDTO) {
+        Optional<City> existCity = cityRepository.findById(cityDTO.getId());
+        if (existCity.isPresent()){
+            Optional<Country> existCountry = countryRepository.findCountryByName(cityDTO.getCountryName());
+            if (existCountry.isPresent()) {
+                return cityRepository.save(existCity.get());
+            }
         }
         return null;
     }
