@@ -60,6 +60,7 @@ public class CityServiceImpl implements CityService {
         if (existCity.isPresent()){
             Optional<Country> existCountry = countryRepository.findCountryByName(cityDTO.getCountryName());
             if (existCountry.isPresent()) {
+                existCity.get().setCountry(existCountry.get());
                 return cityRepository.save(existCity.get());
             }
         }
