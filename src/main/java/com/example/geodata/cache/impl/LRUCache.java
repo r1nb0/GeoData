@@ -65,7 +65,7 @@ public class LRUCache<K, V> implements Cache<K, V> {
         }
     }
 
-    public void remove(K key){
+    public void  remove(K key){
         if (containsKey(key)){
             linkedList.remove(hashMap.get(key));
             hashMap.remove(key);
