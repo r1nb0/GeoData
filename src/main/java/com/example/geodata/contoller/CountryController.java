@@ -3,6 +3,7 @@ package com.example.geodata.contoller;
 
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
+import com.example.geodata.service.CityService;
 import com.example.geodata.service.CountryService;
 import com.example.geodata.service.DistanceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class CountryController {
 
     private final CountryService countryService;
+    private final CityService cityService;
     private final DistanceService distanceService;
 
     @GetMapping("/all")
@@ -40,6 +42,7 @@ public class CountryController {
 
     @DeleteMapping("/delete/{id}")
     public HttpStatus deleteCountryById(@PathVariable Integer id){
+        cityService.refreshCacheAfterRemoveCountry(id);
         Boolean isExist = countryService.deleteCountryById(id);
         if (Boolean.TRUE.equals(isExist)){
             return HttpStatus.OK;

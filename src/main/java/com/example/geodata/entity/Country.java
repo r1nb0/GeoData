@@ -31,7 +31,7 @@ public class Country {
     @Column(name = "longitude")
     private Double longitude;
 
-    @OneToMany(mappedBy = "country", cascade = { CascadeType.MERGE, CascadeType.PERSIST }, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "country", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<City> cities = new ArrayList<>();
 
@@ -44,8 +44,8 @@ public class Country {
 
    public void addLanguage(Language language){
        Integer addId = language.getId();
-       for (var i : languages){
-           if (i.getId().equals(addId)){
+       for (Language lng : languages){
+           if (lng.getId().equals(addId)){
                return;
            }
        }
