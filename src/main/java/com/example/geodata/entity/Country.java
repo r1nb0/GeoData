@@ -43,9 +43,9 @@ public class Country {
    Set<Language> languages = new HashSet<>();
 
    public void addLanguage(Language language){
-       Integer id = language.getId();
+       Integer addId = language.getId();
        for (var i : languages){
-           if (i.getId().equals(id)){
+           if (i.getId().equals(addId)){
                return;
            }
        }
@@ -53,11 +53,11 @@ public class Country {
    }
 
    public void removeLanguage(Language language) {
-       Integer id = language.getId();
+       Integer removeId = language.getId();
        Iterator<Language> iterator = languages.iterator();
        while (iterator.hasNext()) {
            Language i = iterator.next();
-           if (i.getId().equals(id)) {
+           if (i.getId().equals(removeId)) {
                iterator.remove();
                break;
            }
