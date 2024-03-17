@@ -72,7 +72,6 @@ public class LanguageServiceImpl implements LanguageService {
         return getLanguageFromCacheOrRepositoryById(id, false);
     }
 
-
     private Optional<Language> getLanguageFromCacheOrRepositoryById(Integer id, Boolean isErase){
         Optional<Language> language = languageCache.get(id);
         if (language.isEmpty()){
