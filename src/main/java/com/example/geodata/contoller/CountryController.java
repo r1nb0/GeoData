@@ -42,7 +42,7 @@ public class CountryController {
 
     @DeleteMapping("/delete/{id}")
     public HttpStatus deleteCountryById(@PathVariable Integer id){
-        cityService.refreshCacheAfterRemoveCountry(id);
+        cityService.refreshCacheBeforeRemoveCountry(id);
         Boolean isExist = countryService.deleteCountryById(id);
         if (Boolean.TRUE.equals(isExist)){
             return HttpStatus.OK;

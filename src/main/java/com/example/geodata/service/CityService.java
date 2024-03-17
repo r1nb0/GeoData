@@ -22,6 +22,6 @@ public interface CityService {
 
     City update(CityDTO cityDTO);
 
-    void refreshCacheAfterRemoveCountry(Integer countryId);
+    void refreshCacheBeforeRemoveCountry(Integer countryId);
 
 }

@@ -105,7 +105,7 @@ public class CityServiceImpl implements CityService {
         return city;
     }
 
-    public void refreshCacheAfterRemoveCountry(Integer countryId){
+    public void refreshCacheBeforeRemoveCountry(Integer countryId){
         Optional<Country> removingCountry = countryRepository.findById(countryId);
         if (removingCountry.isPresent()){
             for (City city : removingCountry.get().getCities()) {
