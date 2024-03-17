@@ -75,16 +75,16 @@ public class CountryController {
         return new ResponseEntity<>(updateCountry, HttpStatus.OK);
     }
 
-    @GetMapping("/distance/{firstCountry}+{secondCountry}")
-    public ResponseEntity<Object> distance(@PathVariable String firstCountry, @PathVariable String secondCountry){
-        Optional<Country> first = countryService.findByName(firstCountry);
-        Optional<Country> second = countryService.findByName(secondCountry);
+    @GetMapping("/distance/{firstId}+{secondId}")
+    public ResponseEntity<Object> distance(@PathVariable Integer firstId, @PathVariable Integer secondId){
+        Optional<Country> first = countryService.findById(firstId);
+        Optional<Country> second = countryService.findById(secondId);
         if (first.isEmpty() || second.isEmpty())
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objects = objectMapper.createObjectNode();
-        objects.put("First country", firstCountry);
-        objects.put("Second country", secondCountry);
+        objects.put("First country", first.get().getName());
+        objects.put("Second country", second.get().getName());
         Double distance = distanceService.calculateDistance(first.get().getLatitude(), second.get().getLongitude(),
                 second.get().getLatitude(), second.get().getLongitude());
         objects.put("Distance", distance.toString() + "km");

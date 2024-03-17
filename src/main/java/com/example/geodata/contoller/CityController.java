@@ -28,7 +28,7 @@ public class CityController {
     }
 
     @GetMapping("/info/{cityId}")
-    public Optional<City> findByName(@PathVariable Integer cityId){
+    public Optional<City> findById(@PathVariable Integer cityId){
         return cityService.findById(cityId);
     }
 
@@ -69,10 +69,10 @@ public class CityController {
         return new ResponseEntity<>(city, HttpStatus.OK);
     }
 
-    @GetMapping("/distance/{firstCityId}+{secondCityId}")
-    public ResponseEntity<Object> distance(@PathVariable Integer firstCityId, @PathVariable Integer secondCityId){
-        Optional<City> first = cityService.findById(firstCityId);
-        Optional<City> second = cityService.findById(secondCityId);
+    @GetMapping("/distance/{firstId}+{secondId}")
+    public ResponseEntity<Object> distance(@PathVariable Integer firstId, @PathVariable Integer secondId){
+        Optional<City> first = cityService.findById(firstId);
+        Optional<City> second = cityService.findById(secondId);
         if (first.isEmpty() || second.isEmpty())
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         ObjectMapper objectMapper = new ObjectMapper();
