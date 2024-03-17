@@ -1,7 +1,8 @@
 package com.example.geodata.service.impl;
 
+import com.example.geodata.cache.impl.LRUCache;
 import com.example.geodata.entity.Country;
-import com.example.geodata.entity.dto.CityDTO;
+import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
 import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.CountryRepository;
@@ -18,6 +19,7 @@ public class CityServiceImpl implements CityService {
 
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
+    private final LRUCache<Integer, City> cityCache = new LRUCache<>(10);
 
     @Override
     public List<City> getAll() {
@@ -26,22 +28,23 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public Boolean deleteById(Integer id) {
-        Optional<City> city = cityRepository.findById(id);
-        if (city.isPresent()){
-            cityRepository.delete(city.get());
-            return true;
+        Optional<City> city = getCityFromCacheOrRepositoryId(id, true);
+        if (city.isEmpty()){
+            return false;
         }
-        return false;
+        cityCache.remove(id);
+        cityRepository.delete(city.get());
+        return true;
     }
 
     @Override
     public Optional<City> findById(Integer id) {
-        return cityRepository.findById(id);
+        return getCityFromCacheOrRepositoryId(id, false);
     }
 
     @Override
     public City addCityWithExistingCountry(CityDTO cityDTO) {
-        Optional<Country> country = countryRepository.findCountryByName(cityDTO.getCountryName());
+        Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
         if (country.isPresent()) {
             City city = City.builder()
                     .name(cityDTO.getCityName())
@@ -49,39 +52,57 @@ public class CityServiceImpl implements CityService {
                     .longitude(cityDTO.getLongitude())
                     .country(country.get())
                     .build();
-            return cityRepository.save(city);
+            city = cityRepository.save(city);
+            cityCache.put(city.getId(), city);
+            return city;
         }
         return null;
     }
 
     @Override
     public City replaceCountry(CityDTO cityDTO) {
-        Optional<City> existCity = cityRepository.findById(cityDTO.getId());
-        if (existCity.isPresent()){
-            Optional<Country> existCountry = countryRepository.findCountryByName(cityDTO.getCountryName());
-            if (existCountry.isPresent()) {
-                existCity.get().setCountry(existCountry.get());
-                return cityRepository.save(existCity.get());
-            }
-        }
-        return null;
+       Optional<City> city = getCityFromCacheOrRepositoryId(cityDTO.getId(), false);
+       if (city.isPresent()) {
+           Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
+           if (country.isPresent()) {
+               city.get().setCountry(country.get());
+               return cityRepository.save(city.get());
+           }
+       }
+       return null;
     }
 
     @Override
     public City update(CityDTO cityDTO) {
-        Optional<City> cityExist = cityRepository.findById(cityDTO.getId());
-        if (cityExist.isPresent()){
-            if (cityDTO.getLatitude() != null){
-                cityExist.get().setLatitude(cityDTO.getLatitude());
+        Optional<City> city = getCityFromCacheOrRepositoryId(cityDTO.getId(), false);
+        if (city.isPresent()) {
+            if (cityDTO.getLatitude() != null) {
+                city.get().setLatitude(cityDTO.getLatitude());
             }
-            if (cityDTO.getLongitude() != null){
-                cityExist.get().setLongitude(cityDTO.getLongitude());
+            if (cityDTO.getLongitude() != null) {
+                city.get().setLongitude(cityDTO.getLongitude());
             }
-            if (cityDTO.getCityName() != null){
-                cityExist.get().setName(cityDTO.getCityName());
+            if (cityDTO.getCityName() != null) {
+                city.get().setName(cityDTO.getCityName());
             }
-            return cityRepository.save(cityExist.get());
+            return cityRepository.save(city.get());
         }
         return null;
     }
+
+
+    private Optional<City> getCityFromCacheOrRepositoryId(Integer id, Boolean isErase){
+        Optional<City> city = cityCache.get(id);
+        if (city.isEmpty()) {
+            city = cityRepository.findById(id);
+            if (city.isEmpty()){
+                return Optional.empty();
+            }
+            if (Boolean.FALSE.equals(isErase)) {
+                cityCache.put(id, city.get());
+            }
+        }
+        return city;
+    }
+
 }

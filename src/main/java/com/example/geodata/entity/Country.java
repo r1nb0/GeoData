@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "countries")
@@ -34,7 +31,7 @@ public class Country {
     @Column(name = "longitude")
     private Double longitude;
 
-    @OneToMany(mappedBy = "country", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "country", cascade = { CascadeType.MERGE, CascadeType.PERSIST }, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<City> cities = new ArrayList<>();
 
@@ -46,9 +43,25 @@ public class Country {
    Set<Language> languages = new HashSet<>();
 
    public void addLanguage(Language language){
-       this.languages.add(language);
+       Integer id = language.getId();
+       for (var i : languages){
+           if (i.getId().equals(id)){
+               return;
+           }
+       }
+       languages.add(language);
    }
 
-   public void removeLanguage(Language language) { this.languages.remove(language); }
+   public void removeLanguage(Language language) {
+       Integer id = language.getId();
+       Iterator<Language> iterator = languages.iterator();
+       while (iterator.hasNext()) {
+           Language i = iterator.next();
+           if (i.getId().equals(id)) {
+               iterator.remove();
+               break;
+           }
+       }
+   }
 
 }

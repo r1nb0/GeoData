@@ -1,7 +1,7 @@
 package com.example.geodata.service;
 
 import com.example.geodata.entity.Language;
-import com.example.geodata.entity.dto.LanguageDTO;
+import com.example.geodata.dto.LanguageDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +16,8 @@ public interface LanguageService {
 
     Language update(LanguageDTO languageDTO);
 
-    Boolean deleteByName(String name);
+    Boolean deleteById(Integer id);
 
-    Optional<Language> findByName(String name);
+    Optional<Language> findById(Integer id);
 
 }

@@ -1,6 +1,7 @@
 package com.example.geodata.service.impl;
 
-import com.example.geodata.entity.dto.CountryDTO;
+import com.example.geodata.cache.impl.LRUCache;
+import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
 import com.example.geodata.repository.CountryRepository;
@@ -19,6 +20,7 @@ public class CountryServiceImpl implements CountryService {
 
     private final CountryRepository countryRepository;
     private final LanguageRepository languageRepository;
+    private final LRUCache<Integer, Country> countryCache = new LRUCache<>(10);
 
     @Override
     public List<Country> getAll() {
@@ -28,6 +30,11 @@ public class CountryServiceImpl implements CountryService {
     @Override
     public Optional<Country> findByName(String name) {
         return countryRepository.findCountryByName(name);
+    }
+
+    @Override
+    public Optional<Country> findById(Integer id) {
+        return getCountryFromCacheOrRepositoryById(id, false);
     }
 
     @Override
@@ -41,17 +48,18 @@ public class CountryServiceImpl implements CountryService {
                 .languages(new HashSet<>())
                 .build();
         for (Language language : languages) {
-            if (languageRepository.existsById(language.getId())) {
-                country.addLanguage(language);
-            }
+            country.addLanguage(language);
         }
-        return countryRepository.save(country);
+        country = countryRepository.save(country);
+        countryCache.put(country.getId(), country);
+        return country;
     }
 
     @Override
-    public Boolean deleteCountryByName(String name) {
-        Optional<Country> country = countryRepository.findCountryByName(name);
+    public Boolean deleteCountryById(Integer id) {
+        Optional<Country> country = getCountryFromCacheOrRepositoryById(id, true);
         if (country.isPresent()) {
+            countryCache.remove(id);
             countryRepository.delete(country.get());
             return true;
         }
@@ -60,48 +68,62 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Country addLanguage(CountryDTO countryDTO) {
-        Optional<Country> countryExist = countryRepository.findById(countryDTO.getId());
-        if (countryExist.isPresent()){
+        Optional<Country> country = getCountryFromCacheOrRepositoryById(countryDTO.getId(), false);
+        if (country.isPresent()){
             List<Language> languageExist = languageRepository.findByNames(countryDTO.getLanguages());
-                for (Language language : languageExist){
-                    countryExist.get().addLanguage(language);
-                }
-            return countryRepository.save(countryExist.get());
-        }
-        return null;
-    }
-
-    @Override
-    public Country updateInfo(CountryDTO countryDTO) {
-        Optional<Country> countryExist = countryRepository.findById(countryDTO.getId());
-        if (countryExist.isPresent()) {
-            if (countryDTO.getLongitude() != null) {
-                countryExist.get().setLongitude(countryDTO.getLongitude());
+            for (Language language : languageExist){
+                country.get().addLanguage(language);
             }
-            if (countryDTO.getLatitude() != null) {
-                countryExist.get().setLatitude(countryDTO.getLatitude());
-            }
-            if (countryDTO.getNationality() != null) {
-                countryExist.get().setNationality(countryDTO.getNationality());
-            }
-            if (countryDTO.getName() != null) {
-                countryExist.get().setName(countryDTO.getName());
-            }
-            return countryRepository.save(countryExist.get());
+            return countryRepository.save(country.get());
         }
         return null;
     }
 
     @Override
     public Country deleteLanguage(CountryDTO countryDTO){
-        List<Language> languages = languageRepository.findByNames(countryDTO.getLanguages());
-        Optional<Country> country = countryRepository.findById(countryDTO.getId());
+        Optional<Country> country = getCountryFromCacheOrRepositoryById(countryDTO.getId(), false);
         if (country.isPresent()) {
+            List<Language> languages = languageRepository.findByNames(countryDTO.getLanguages());
             for (Language language : languages) {
                 country.get().removeLanguage(language);
             }
             return countryRepository.save(country.get());
         }
         return null;
+    }
+
+    @Override
+    public Country updateInfo(CountryDTO countryDTO) {
+        Optional<Country> country = getCountryFromCacheOrRepositoryById(countryDTO.getId(), false);
+        if (country.isPresent()) {
+            if (countryDTO.getLongitude() != null) {
+                country.get().setLongitude(countryDTO.getLongitude());
+            }
+            if (countryDTO.getLatitude() != null) {
+                country.get().setLatitude(countryDTO.getLatitude());
+            }
+            if (countryDTO.getNationality() != null) {
+                country.get().setNationality(countryDTO.getNationality());
+            }
+            if (countryDTO.getName() != null) {
+                country.get().setName(countryDTO.getName());
+            }
+            return countryRepository.save(country.get());
+        }
+        return null;
+    }
+
+    private Optional<Country> getCountryFromCacheOrRepositoryById(Integer id, Boolean isErase){
+        Optional<Country> country = countryCache.get(id);
+        if (country.isEmpty()) {
+            country = countryRepository.findById(id);
+            if (country.isEmpty()){
+                return Optional.empty();
+            }
+            if (Boolean.FALSE.equals(isErase)) {
+                countryCache.put(id, country.get());
+            }
+        }
+        return country;
     }
 }

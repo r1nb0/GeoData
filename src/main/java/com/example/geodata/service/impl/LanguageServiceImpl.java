@@ -1,9 +1,10 @@
 package com.example.geodata.service.impl;
 
 
+import com.example.geodata.cache.impl.LRUCache;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
-import com.example.geodata.entity.dto.LanguageDTO;
+import com.example.geodata.dto.LanguageDTO;
 import com.example.geodata.repository.LanguageRepository;
 import com.example.geodata.service.LanguageService;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class LanguageServiceImpl implements LanguageService {
 
     private final LanguageRepository languageRepository;
+    private final LRUCache<Integer, Language> languageCache = new LRUCache<>(10);
 
     @Override
     public List<Language> findAll() {
@@ -31,39 +33,58 @@ public class LanguageServiceImpl implements LanguageService {
                 .countries(new ArrayList<>())
                 .code(languageDTO.getCode())
                 .build();
-        return languageRepository.save(language);
+        language = languageRepository.save(language);
+        languageCache.put(language.getId(), language);
+        return language;
     }
 
     @Override
     public Language update(LanguageDTO languageDTO) {
-        Optional<Language> languageExist = languageRepository.findById(languageDTO.getId());
-        if (languageExist.isPresent()){
-            if (languageDTO.getCode() != null){
-                languageExist.get().setCode(languageDTO.getCode());
-            }
-            if (languageDTO.getName() != null){
-                languageExist.get().setName(languageDTO.getName());
-            }
-            return languageRepository.save(languageExist.get());
+        Optional<Language> language = getLanguageFromCacheOrRepositoryById(languageDTO.getId(), false);
+        if (language.isEmpty()){
+            return null;
         }
-        return null;
+        if (languageDTO.getCode() != null){
+            language.get().setCode(languageDTO.getCode());
+        }
+        if (languageDTO.getName() != null){
+            language.get().setName(languageDTO.getName());
+        }
+        return languageRepository.save(language.get());
     }
 
     @Override
-    public Boolean deleteByName(String name) {
-        Optional<Language> language = languageRepository.findByName(name);
-        if (language.isPresent()) {
-            List<Country> existingCountries = language.get().getCountries();
-            for (Country country : existingCountries)
-                country.removeLanguage(language.get());
-            languageRepository.delete(language.get());
-            return true;
+    public Boolean deleteById(Integer id) {
+        Optional<Language> language = getLanguageFromCacheOrRepositoryById(id , true);
+        if (language.isEmpty()){
+            return false;
         }
-        return false;
+        List<Country> existingCountries = language.get().getCountries();
+        for (Country country : existingCountries)
+            country.removeLanguage(language.get());
+        languageCache.remove(id);
+        languageRepository.delete(language.get());
+        return true;
     }
 
     @Override
-    public Optional<Language> findByName(String name) {
-        return languageRepository.findByName(name);
+    public Optional<Language> findById(Integer id) {
+        return getLanguageFromCacheOrRepositoryById(id, false);
     }
+
+
+    private Optional<Language> getLanguageFromCacheOrRepositoryById(Integer id, Boolean isErase){
+        Optional<Language> language = languageCache.get(id);
+        if (language.isEmpty()){
+            language = languageRepository.findById(id);
+            if (language.isEmpty()){
+                return Optional.empty();
+            }
+            if (Boolean.FALSE.equals(isErase)) {
+                languageCache.put(id, language.get());
+            }
+        }
+        return language;
+    }
+
 }

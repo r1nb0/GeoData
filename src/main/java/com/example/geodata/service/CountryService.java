@@ -1,6 +1,6 @@
 package com.example.geodata.service;
 
-import com.example.geodata.entity.dto.CountryDTO;
+import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +14,11 @@ public interface CountryService {
 
     Optional<Country> findByName(String name);
 
+    Optional<Country> findById(Integer id);
+
     Country addCountryWithExistingLanguages(CountryDTO countryDTO);
 
-    Boolean deleteCountryByName(String name);
+    Boolean deleteCountryById(Integer id);
 
     Country deleteLanguage(CountryDTO countryDTO);
 

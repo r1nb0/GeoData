@@ -1,7 +1,7 @@
 package com.example.geodata.contoller;
 
 
-import com.example.geodata.entity.dto.CountryDTO;
+import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
 import com.example.geodata.service.CountryService;
 import com.example.geodata.service.DistanceService;
@@ -28,9 +28,9 @@ public class CountryController {
         return countryService.getAll();
     }
 
-    @GetMapping("/info/{nameCountry}")
-    public Optional<Country> findByName(@PathVariable String nameCountry){
-        return countryService.findByName(nameCountry);
+    @GetMapping("/info/{id}")
+    public Optional<Country> findById(@PathVariable Integer id){
+        return countryService.findById(id);
     }
 
     @PostMapping("/create")
@@ -38,9 +38,9 @@ public class CountryController {
         return new ResponseEntity<>(countryService.addCountryWithExistingLanguages(countryDTO), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{nameCountry}")
-    public HttpStatus deleteCountryByName(@PathVariable String nameCountry){
-        Boolean isExist = countryService.deleteCountryByName(nameCountry);
+    @DeleteMapping("/delete/{id}")
+    public HttpStatus deleteCountryById(@PathVariable Integer id){
+        Boolean isExist = countryService.deleteCountryById(id);
         if (Boolean.TRUE.equals(isExist)){
             return HttpStatus.OK;
         }else{

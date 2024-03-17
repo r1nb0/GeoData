@@ -1,6 +1,6 @@
 package com.example.geodata.service;
 
-import com.example.geodata.entity.dto.CityDTO;
+import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
 import org.springframework.stereotype.Service;
 

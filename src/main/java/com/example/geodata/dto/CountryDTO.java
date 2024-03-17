@@ -1,4 +1,4 @@
-package com.example.geodata.entity.dto;
+package com.example.geodata.dto;
 
 import lombok.Data;
 

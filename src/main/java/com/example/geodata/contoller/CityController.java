@@ -1,6 +1,6 @@
 package com.example.geodata.contoller;
 
-import com.example.geodata.entity.dto.CityDTO;
+import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
 import com.example.geodata.service.CityService;
 import com.example.geodata.service.DistanceService;

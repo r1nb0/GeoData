@@ -1,7 +1,7 @@
 package com.example.geodata.contoller;
 
 import com.example.geodata.entity.Language;
-import com.example.geodata.entity.dto.LanguageDTO;
+import com.example.geodata.dto.LanguageDTO;
 import com.example.geodata.service.LanguageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,9 +23,9 @@ public class LanguageController {
         return new ResponseEntity<>(languageService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/info/{languageName}")
-    Optional<Language> getByName(@PathVariable String languageName){
-        return languageService.findByName(languageName);
+    @GetMapping("/info/{id}")
+    Optional<Language> getById(@PathVariable Integer id){
+        return languageService.findById(id);
     }
 
     @PostMapping("/create")
@@ -33,9 +33,9 @@ public class LanguageController {
         return new ResponseEntity<>(languageService.save(languageDTO), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{nameLanguage}")
-    HttpStatus deleteLanguage(@PathVariable String nameLanguage){
-        Boolean isExist = languageService.deleteByName(nameLanguage);
+    @DeleteMapping("/delete/{idLanguage}")
+    HttpStatus deleteLanguage(@PathVariable Integer idLanguage){
+        Boolean isExist = languageService.deleteById(idLanguage);
         if (Boolean.TRUE.equals(isExist)){
             return HttpStatus.OK;
         }else{

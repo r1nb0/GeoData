@@ -1,4 +1,4 @@
-package com.example.geodata.entity.dto;
+package com.example.geodata.dto;
 
 
 import lombok.Data;
@@ -10,7 +10,7 @@ public class CityDTO {
 
     private String cityName;
 
-    private String countryName;
+    private Integer countryId;
 
     private Double longitude;
 
