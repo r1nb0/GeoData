@@ -2,7 +2,6 @@ package com.example.geodata.service.impl;
 
 
 import com.example.geodata.cache.impl.LRUCache;
-import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
 import com.example.geodata.dto.LanguageDTO;
 import com.example.geodata.repository.LanguageRepository;
@@ -40,7 +39,7 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public Language update(LanguageDTO languageDTO) {
-        Optional<Language> language = getLanguageFromCacheOrRepositoryById(languageDTO.getId(), false);
+        Optional<Language> language = languageRepository.findById(languageDTO.getId());
         if (language.isEmpty()){
             return null;
         }
@@ -50,40 +49,30 @@ public class LanguageServiceImpl implements LanguageService {
         if (languageDTO.getName() != null){
             language.get().setName(languageDTO.getName());
         }
-        return languageRepository.save(language.get());
+        Language saveLanguage = languageRepository.save(language.get());
+        languageCache.put(saveLanguage.getId(), saveLanguage);
+        return saveLanguage;
     }
 
     @Override
     public Boolean deleteById(Integer id) {
-        Optional<Language> language = getLanguageFromCacheOrRepositoryById(id , true);
-        if (language.isEmpty()){
-            return false;
+        Optional<Language> language = findById(id);
+        if (language.isPresent()) {
+            languageRepository.removalOfLanguagesInCountries(id);
+            languageCache.remove(id);
+            languageRepository.deleteById(id);
+            return true;
         }
-        List<Country> existingCountries = language.get().getCountries();
-        for (Country country : existingCountries)
-            country.removeLanguage(language.get());
-        languageCache.remove(id);
-        languageRepository.delete(language.get());
-        return true;
+        return false;
     }
 
     @Override
     public Optional<Language> findById(Integer id) {
-        return getLanguageFromCacheOrRepositoryById(id, false);
-    }
-
-    private Optional<Language> getLanguageFromCacheOrRepositoryById(Integer id, Boolean isErase){
         Optional<Language> language = languageCache.get(id);
         if (language.isEmpty()){
             language = languageRepository.findById(id);
-            if (language.isEmpty()){
-                return Optional.empty();
-            }
-            if (Boolean.FALSE.equals(isErase)) {
-                languageCache.put(id, language.get());
-            }
+            language.ifPresent(value -> languageCache.put(value.getId(), value));
         }
         return language;
     }
-
 }

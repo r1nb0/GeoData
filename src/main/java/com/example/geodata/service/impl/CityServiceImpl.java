@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 @AllArgsConstructor
 public class CityServiceImpl implements CityService {
@@ -28,18 +29,22 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public Boolean deleteById(Integer id) {
-        Optional<City> city = getCityFromCacheOrRepositoryId(id, true);
-        if (city.isEmpty()){
-            return false;
+        if (cityRepository.existsById(id)) {
+            cityCache.remove(id);
+            cityRepository.deleteById(id);
+            return true;
         }
-        cityCache.remove(id);
-        cityRepository.delete(city.get());
-        return true;
+        return false;
     }
 
     @Override
     public Optional<City> findById(Integer id) {
-        return getCityFromCacheOrRepositoryId(id, false);
+        Optional<City> city = cityCache.get(id);
+        if (city.isEmpty()){
+            city = cityRepository.findById(id);
+            city.ifPresent(value -> cityCache.put(value.getId(), value));
+        }
+        return city;
     }
 
     @Override
@@ -61,12 +66,12 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public City replaceCountry(CityDTO cityDTO) {
-       Optional<City> city = getCityFromCacheOrRepositoryId(cityDTO.getId(), false);
+       Optional<City> city = cityRepository.findById(cityDTO.getId());
        if (city.isPresent()) {
            Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
            if (country.isPresent()) {
                city.get().setCountry(country.get());
-               return cityRepository.save(city.get());
+               cityRepository.save(city.get());
            }
        }
        return null;
@@ -74,7 +79,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public City update(CityDTO cityDTO) {
-        Optional<City> city = getCityFromCacheOrRepositoryId(cityDTO.getId(), false);
+        Optional<City> city = cityRepository.findById(cityDTO.getId());
         if (city.isPresent()) {
             if (cityDTO.getLatitude() != null) {
                 city.get().setLatitude(cityDTO.getLatitude());
@@ -85,33 +90,22 @@ public class CityServiceImpl implements CityService {
             if (cityDTO.getCityName() != null) {
                 city.get().setName(cityDTO.getCityName());
             }
-            return cityRepository.save(city.get());
+            City saveCity = cityRepository.save(city.get());
+            cityCache.put(saveCity.getId(), saveCity);
+            return saveCity;
         }
         return null;
     }
 
-
-    private Optional<City> getCityFromCacheOrRepositoryId(Integer id, Boolean isErase){
-        Optional<City> city = cityCache.get(id);
-        if (city.isEmpty()) {
-            city = cityRepository.findById(id);
-            if (city.isEmpty()){
-                return Optional.empty();
-            }
-            if (Boolean.FALSE.equals(isErase)) {
-                cityCache.put(id, city.get());
-            }
-        }
-        return city;
-    }
-
-    public void refreshCacheBeforeRemoveCountry(Integer countryId){
-        Optional<Country> removingCountry = countryRepository.findById(countryId);
-        if (removingCountry.isPresent()){
-            for (City city : removingCountry.get().getCities()) {
+    @Override
+    public void cacheInvalidationFromCountries(Integer countryId) {
+        Optional<Country> country = countryRepository.findById(countryId);
+        if (country.isPresent()){
+            for (City city : country.get().getCities()){
                 cityCache.remove(city.getId());
             }
         }
     }
+
 
 }

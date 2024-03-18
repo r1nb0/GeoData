@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface LanguageRepository extends JpaRepository<Language, Integer> {
@@ -15,6 +14,7 @@ public interface LanguageRepository extends JpaRepository<Language, Integer> {
     @Query(value = "SELECT * FROM languages obj where obj.language_name in (?1)", nativeQuery = true)
     List<Language> findByNames(@Param("1") List<String> names);
 
-    Optional<Language> findByName(String name);
+    @Query(value = "DELETE FROM countries_languages WHERE language_id = :languageId", nativeQuery = true)
+    void removalOfLanguagesInCountries(@Param("languageId") Integer languageId);
 
 }

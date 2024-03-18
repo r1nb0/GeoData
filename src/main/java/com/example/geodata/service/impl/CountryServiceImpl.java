@@ -2,8 +2,10 @@ package com.example.geodata.service.impl;
 
 import com.example.geodata.cache.impl.LRUCache;
 import com.example.geodata.dto.CountryDTO;
+import com.example.geodata.entity.City;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
+import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.repository.LanguageRepository;
 import com.example.geodata.service.CountryService;
@@ -20,6 +22,7 @@ public class CountryServiceImpl implements CountryService {
 
     private final CountryRepository countryRepository;
     private final LanguageRepository languageRepository;
+    private final CityRepository cityRepository;
     private final LRUCache<Integer, Country> countryCache = new LRUCache<>(10);
 
     @Override
@@ -28,13 +31,13 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Optional<Country> findByName(String name) {
-        return countryRepository.findCountryByName(name);
-    }
-
-    @Override
     public Optional<Country> findById(Integer id) {
-        return getCountryFromCacheOrRepositoryById(id, false);
+        Optional<Country> country = countryCache.get(id);
+        if (country.isEmpty()){
+            country = countryRepository.findById(id);
+            country.ifPresent(value -> countryCache.put(value.getId(), value));
+        }
+        return country;
     }
 
     @Override
@@ -57,10 +60,9 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Boolean deleteCountryById(Integer id) {
-        Optional<Country> country = getCountryFromCacheOrRepositoryById(id, true);
-        if (country.isPresent()) {
+        if (countryRepository.existsById(id)) {
             countryCache.remove(id);
-            countryRepository.delete(country.get());
+            countryRepository.deleteById(id);
             return true;
         }
         return false;
@@ -68,33 +70,36 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Country addLanguage(CountryDTO countryDTO) {
-        Optional<Country> country = getCountryFromCacheOrRepositoryById(countryDTO.getId(), false);
+        Optional<Country> country = countryRepository.findById(countryDTO.getId());
         if (country.isPresent()){
             List<Language> languageExist = languageRepository.findByNames(countryDTO.getLanguages());
             for (Language language : languageExist){
                 country.get().addLanguage(language);
             }
-            return countryRepository.save(country.get());
-        }
+            Country saveCountry = countryRepository.save(country.get());
+            countryCache.put(saveCountry.getId(), saveCountry);
+            return saveCountry;}
         return null;
     }
 
     @Override
     public Country deleteLanguage(CountryDTO countryDTO){
-        Optional<Country> country = getCountryFromCacheOrRepositoryById(countryDTO.getId(), false);
+        Optional<Country> country = countryRepository.findById(countryDTO.getId());
         if (country.isPresent()) {
             List<Language> languages = languageRepository.findByNames(countryDTO.getLanguages());
             for (Language language : languages) {
                 country.get().removeLanguage(language);
             }
-            return countryRepository.save(country.get());
+            Country saveCountry =  countryRepository.save(country.get());
+            countryCache.put(saveCountry.getId(), saveCountry);
+            return saveCountry;
         }
         return null;
     }
 
     @Override
     public Country updateInfo(CountryDTO countryDTO) {
-        Optional<Country> country = getCountryFromCacheOrRepositoryById(countryDTO.getId(), false);
+        Optional<Country> country = countryRepository.findById(countryDTO.getId());
         if (country.isPresent()) {
             if (countryDTO.getLongitude() != null) {
                 country.get().setLongitude(countryDTO.getLongitude());
@@ -108,22 +113,28 @@ public class CountryServiceImpl implements CountryService {
             if (countryDTO.getName() != null) {
                 country.get().setName(countryDTO.getName());
             }
-            return countryRepository.save(country.get());
+            Country saveCountry = countryRepository.save(country.get());
+            countryCache.put(saveCountry.getId(), saveCountry);
+            return saveCountry;
         }
         return null;
     }
 
-    private Optional<Country> getCountryFromCacheOrRepositoryById(Integer id, Boolean isErase){
-        Optional<Country> country = countryCache.get(id);
-        if (country.isEmpty()) {
-            country = countryRepository.findById(id);
-            if (country.isEmpty()){
-                return Optional.empty();
-            }
-            if (Boolean.FALSE.equals(isErase)) {
-                countryCache.put(id, country.get());
+    @Override
+    public void cacheInvalidationFromLanguages(Integer languageId) {
+        Optional<Language> language = languageRepository.findById(languageId);
+        if (language.isPresent()){
+            for (Country country : language.get().getCountries()){
+                countryCache.remove(country.getId());
             }
         }
-        return country;
     }
+
+    @Override
+    public void cacheInvalidationFromCities(Integer cityId) {
+        Optional<City> city = cityRepository.findById(cityId);
+        city.ifPresent(value -> countryCache.remove(value.getId()));
+    }
+
+
 }

@@ -43,25 +43,11 @@ public class Country {
    Set<Language> languages = new HashSet<>();
 
    public void addLanguage(Language language){
-       Integer addId = language.getId();
-       for (Language lng : languages){
-           if (lng.getId().equals(addId)){
-               return;
-           }
-       }
        languages.add(language);
    }
 
    public void removeLanguage(Language language) {
-       Integer removeId = language.getId();
-       Iterator<Language> iterator = languages.iterator();
-       while (iterator.hasNext()) {
-           Language i = iterator.next();
-           if (i.getId().equals(removeId)) {
-               iterator.remove();
-               break;
-           }
-       }
+       languages.remove(language);
    }
 
 }

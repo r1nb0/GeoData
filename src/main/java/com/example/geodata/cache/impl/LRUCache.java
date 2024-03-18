@@ -1,13 +1,10 @@
 package com.example.geodata.cache.impl;
 import com.example.geodata.cache.Cache;
-import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Optional;
 
-
-@Getter
 public class LRUCache<K, V> implements Cache<K, V> {
 
     private final int capacity;
@@ -65,13 +62,13 @@ public class LRUCache<K, V> implements Cache<K, V> {
         }
     }
 
-    public void  remove(K key){
+    public void remove(K key){
         if (containsKey(key)){
             linkedList.remove(hashMap.get(key));
             hashMap.remove(key);
         }
     }
 
-    protected record Node<K, V>(K key, V value) { }
+    public record Node<K, V>(K key, V value) { }
 
 }

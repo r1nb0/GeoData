@@ -12,8 +12,6 @@ public interface CountryService {
 
     List<Country> getAll();
 
-    Optional<Country> findByName(String name);
-
     Optional<Country> findById(Integer id);
 
     Country addCountryWithExistingLanguages(CountryDTO countryDTO);
@@ -25,5 +23,9 @@ public interface CountryService {
     Country addLanguage(CountryDTO countryDTO);
 
     Country updateInfo(CountryDTO countryDTO);
+
+    void cacheInvalidationFromLanguages(Integer languageId);
+
+    void cacheInvalidationFromCities(Integer cityId);
 
 }
