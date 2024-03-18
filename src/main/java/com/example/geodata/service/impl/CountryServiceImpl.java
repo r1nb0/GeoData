@@ -73,17 +73,18 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Country addLanguage(CountryDTO countryDTO) {
-        Optional<Country> country = countryRepository.findById(countryDTO.getId());
-        if (country.isPresent()){
-            List<Language> languageExist = languageRepository.findByNames(countryDTO.getLanguages());
-            for (Language language : languageExist){
-                country.get().addLanguage(language);
+        public Country addLanguage(CountryDTO countryDTO) {
+            Optional<Country> country = countryRepository.findById(countryDTO.getId());
+            if (country.isPresent()){
+                List<Language> languageExist = languageRepository.findByNames(countryDTO.getLanguages());
+                for (Language language : languageExist){
+                    country.get().addLanguage(language);
+                }
+                Country saveCountry = countryRepository.save(country.get());
+                countryCache.put(saveCountry.getId(), saveCountry);
+                return saveCountry;
             }
-            Country saveCountry = countryRepository.save(country.get());
-            countryCache.put(saveCountry.getId(), saveCountry);
-            return saveCountry;}
-        return null;
+            return null;
     }
 
     @Override

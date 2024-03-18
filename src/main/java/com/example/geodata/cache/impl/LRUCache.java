@@ -8,7 +8,9 @@ import java.util.Optional;
 public class LRUCache<K, V> implements Cache<K, V> {
 
     private final int capacity;
+
     protected HashMap<K, Node<K, V>> hashMap;
+
     protected LinkedList<Node<K, V>> linkedList;
 
     public LRUCache(int capacity){
