@@ -1,7 +1,7 @@
 package com.example.geodata.service.impl;
 
-import com.example.geodata.cache.CacheManagerCountry;
-import com.example.geodata.cache.CacheManagerLanguage;
+import com.example.geodata.cache.LRUCacheCountry;
+import com.example.geodata.cache.LRUCacheLanguage;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
 import com.example.geodata.dto.LanguageDTO;
@@ -19,8 +19,8 @@ import java.util.Optional;
 public class LanguageServiceImpl implements LanguageService {
 
     private final LanguageRepository languageRepository;
-    private final CacheManagerCountry countryCache;
-    private final CacheManagerLanguage languageCache;
+    private final LRUCacheCountry countryCache;
+    private final LRUCacheLanguage languageCache;
 
     @Override
     public List<Language> findAll() {

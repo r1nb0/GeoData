@@ -1,7 +1,7 @@
 package com.example.geodata.service.impl;
 
-import com.example.geodata.cache.CacheManagerCity;
-import com.example.geodata.cache.CacheManagerCountry;
+import com.example.geodata.cache.LRUCacheCity;
+import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.entity.Country;
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
@@ -21,8 +21,8 @@ public class CityServiceImpl implements CityService {
 
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
-    private final CacheManagerCity cityCache;
-    private final CacheManagerCountry countryCache;
+    private final LRUCacheCity cityCache;
+    private final LRUCacheCountry countryCache;
 
     @Override
     public List<City> getAll() {

@@ -7,20 +7,20 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class CacheManagerCity {
+public class LRUCacheCity {
 
-    private final LRUCache<Integer, City> lruCache = new LRUCache<>(100);
+    private final LRUCache<Integer, City> LRUCache = new LRUCache<>(100);
 
     public void put(Integer key, City city){
-        lruCache.put(key, city);
+        LRUCache.put(key, city);
     }
 
     public Optional<City> get(Integer key){
-        return lruCache.get(key);
+        return LRUCache.get(key);
     }
 
     public void remove(Integer key){
-        lruCache.remove(key);
+        LRUCache.remove(key);
     }
 
 }
