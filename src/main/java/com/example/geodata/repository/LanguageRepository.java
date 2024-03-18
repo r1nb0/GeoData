@@ -14,7 +14,7 @@ public interface LanguageRepository extends JpaRepository<Language, Integer> {
     @Query(value = "SELECT * FROM languages obj where obj.language_name in (?1)", nativeQuery = true)
     List<Language> findByNames(@Param("1") List<String> names);
 
-    @Query(value = "DELETE FROM countries_languages WHERE language_id = :languageId", nativeQuery = true)
-    void removalOfLanguagesInCountries(@Param("languageId") Integer languageId);
+    @Query(value = "DELETE FROM countries_languages WHERE language_id = :languageId RETURNING country_id", nativeQuery = true)
+    List<Integer> deleteLanguageByIdAndReturnCountryIds(@Param("languageId") Integer languageId);
 
 }

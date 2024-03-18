@@ -1,7 +1,8 @@
 package com.example.geodata.service.impl;
 
-
-import com.example.geodata.cache.impl.LRUCache;
+import com.example.geodata.cache.CacheManagerCountry;
+import com.example.geodata.cache.CacheManagerLanguage;
+import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
 import com.example.geodata.dto.LanguageDTO;
 import com.example.geodata.repository.LanguageRepository;
@@ -18,7 +19,8 @@ import java.util.Optional;
 public class LanguageServiceImpl implements LanguageService {
 
     private final LanguageRepository languageRepository;
-    private final LRUCache<Integer, Language> languageCache = new LRUCache<>(10);
+    private final CacheManagerCountry countryCache;
+    private final CacheManagerLanguage languageCache;
 
     @Override
     public List<Language> findAll() {
@@ -50,6 +52,9 @@ public class LanguageServiceImpl implements LanguageService {
             language.get().setName(languageDTO.getName());
         }
         Language saveLanguage = languageRepository.save(language.get());
+        for (Country country : saveLanguage.getCountries()){
+            countryCache.remove(country.getId());
+        }
         languageCache.put(saveLanguage.getId(), saveLanguage);
         return saveLanguage;
     }
@@ -58,7 +63,10 @@ public class LanguageServiceImpl implements LanguageService {
     public Boolean deleteById(Integer id) {
         Optional<Language> language = findById(id);
         if (language.isPresent()) {
-            languageRepository.removalOfLanguagesInCountries(id);
+            List<Integer> countriesIds = languageRepository.deleteLanguageByIdAndReturnCountryIds(id);
+            for (Integer countryId : countriesIds){
+                countryCache.remove(countryId);
+            }
             languageCache.remove(id);
             languageRepository.deleteById(id);
             return true;

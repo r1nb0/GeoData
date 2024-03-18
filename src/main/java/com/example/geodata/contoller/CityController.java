@@ -3,7 +3,6 @@ package com.example.geodata.contoller;
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
 import com.example.geodata.service.CityService;
-import com.example.geodata.service.CountryService;
 import com.example.geodata.service.DistanceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -21,7 +20,6 @@ import java.util.Optional;
 public class CityController {
 
     private final CityService cityService;
-    private final CountryService countryService;
     private final DistanceService distanceService;
 
     @GetMapping("/all")
@@ -36,7 +34,6 @@ public class CityController {
 
     @PostMapping("/create")
     public ResponseEntity<City> addCity(@RequestBody CityDTO cityDTO){
-        countryService.cacheInvalidationFromCities(cityDTO.getId());
         City existCity = cityService.addCityWithExistingCountry(cityDTO);
         if (existCity == null){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -46,7 +43,6 @@ public class CityController {
 
     @DeleteMapping("/delete/{cityId}")
     public HttpStatus deleteCityById(@PathVariable Integer cityId){
-        countryService.cacheInvalidationFromCities(cityId);
         Boolean isExist = cityService.deleteById(cityId);
         if (Boolean.TRUE.equals(isExist)) {
             return HttpStatus.OK;
@@ -57,7 +53,6 @@ public class CityController {
 
     @PutMapping("/change_country")
     public ResponseEntity<City> changeCountry(@RequestBody CityDTO cityDTO){
-        countryService.cacheInvalidationFromCities(cityDTO.getId());
         City city = cityService.replaceCountry(cityDTO);
         if (city == null){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -67,7 +62,6 @@ public class CityController {
 
     @PutMapping("/update_info")
     public ResponseEntity<City> updateInfo(@RequestBody CityDTO cityDTO){
-        countryService.cacheInvalidationFromCities(cityDTO.getId());
         City city = cityService.update(cityDTO);
         if (city == null){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);

@@ -1,11 +1,11 @@
 package com.example.geodata.service.impl;
 
-import com.example.geodata.cache.impl.LRUCache;
+import com.example.geodata.cache.CacheManagerCountry;
+import com.example.geodata.cache.CacheManagerCity;
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.City;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
-import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.repository.LanguageRepository;
 import com.example.geodata.service.CountryService;
@@ -22,8 +22,8 @@ public class CountryServiceImpl implements CountryService {
 
     private final CountryRepository countryRepository;
     private final LanguageRepository languageRepository;
-    private final CityRepository cityRepository;
-    private final LRUCache<Integer, Country> countryCache = new LRUCache<>(10);
+    private final CacheManagerCity cityCache;
+    private final CacheManagerCountry countryCache;
 
     @Override
     public List<Country> getAll() {
@@ -60,9 +60,13 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Boolean deleteCountryById(Integer id) {
-        if (countryRepository.existsById(id)) {
+        Optional<Country> country = countryRepository.findById(id);
+        if (country.isPresent()) {
             countryCache.remove(id);
-            countryRepository.deleteById(id);
+            for (City city : country.get().getCities()){
+                cityCache.remove(city.getId());
+            }
+            countryRepository.delete(country.get());
             return true;
         }
         return false;
@@ -119,22 +123,5 @@ public class CountryServiceImpl implements CountryService {
         }
         return null;
     }
-
-    @Override
-    public void cacheInvalidationFromLanguages(Integer languageId) {
-        Optional<Language> language = languageRepository.findById(languageId);
-        if (language.isPresent()){
-            for (Country country : language.get().getCountries()){
-                countryCache.remove(country.getId());
-            }
-        }
-    }
-
-    @Override
-    public void cacheInvalidationFromCities(Integer cityId) {
-        Optional<City> city = cityRepository.findById(cityId);
-        city.ifPresent(value -> countryCache.remove(value.getId()));
-    }
-
 
 }

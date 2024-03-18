@@ -1,6 +1,7 @@
 package com.example.geodata.service.impl;
 
-import com.example.geodata.cache.impl.LRUCache;
+import com.example.geodata.cache.CacheManagerCity;
+import com.example.geodata.cache.CacheManagerCountry;
 import com.example.geodata.entity.Country;
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
@@ -20,7 +21,8 @@ public class CityServiceImpl implements CityService {
 
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
-    private final LRUCache<Integer, City> cityCache = new LRUCache<>(10);
+    private final CacheManagerCity cityCache;
+    private final CacheManagerCountry countryCache;
 
     @Override
     public List<City> getAll() {
@@ -29,9 +31,11 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public Boolean deleteById(Integer id) {
-        if (cityRepository.existsById(id)) {
+        Optional<City> city = cityRepository.findById(id);
+        if (city.isPresent()) {
             cityCache.remove(id);
-            cityRepository.deleteById(id);
+            countryCache.remove(city.get().getCountry().getId());
+            cityRepository.delete(city.get());
             return true;
         }
         return false;
@@ -59,6 +63,7 @@ public class CityServiceImpl implements CityService {
                     .build();
             city = cityRepository.save(city);
             cityCache.put(city.getId(), city);
+            countryCache.remove(city.getCountry().getId());
             return city;
         }
         return null;
@@ -71,7 +76,9 @@ public class CityServiceImpl implements CityService {
            Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
            if (country.isPresent()) {
                city.get().setCountry(country.get());
-               cityRepository.save(city.get());
+               City saveCity = cityRepository.save(city.get());
+               cityCache.put(saveCity.getId(), saveCity);
+               countryCache.remove(saveCity.getCountry().getId());
            }
        }
        return null;
@@ -91,21 +98,11 @@ public class CityServiceImpl implements CityService {
                 city.get().setName(cityDTO.getCityName());
             }
             City saveCity = cityRepository.save(city.get());
+            countryCache.remove(saveCity.getCountry().getId());
             cityCache.put(saveCity.getId(), saveCity);
             return saveCity;
         }
         return null;
     }
-
-    @Override
-    public void cacheInvalidationFromCountries(Integer countryId) {
-        Optional<Country> country = countryRepository.findById(countryId);
-        if (country.isPresent()){
-            for (City city : country.get().getCities()){
-                cityCache.remove(city.getId());
-            }
-        }
-    }
-
 
 }

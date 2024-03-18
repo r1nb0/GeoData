@@ -24,8 +24,4 @@ public interface CountryService {
 
     Country updateInfo(CountryDTO countryDTO);
 
-    void cacheInvalidationFromLanguages(Integer languageId);
-
-    void cacheInvalidationFromCities(Integer cityId);
-
 }
