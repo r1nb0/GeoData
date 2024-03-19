@@ -125,4 +125,9 @@ public class CountryServiceImpl implements CountryService {
         return null;
     }
 
+    @Override
+    public List<Country> findAllCountriesContainingSpecifiedLanguage(String name) {
+        return countryRepository.findAllCountriesContainingSpecifiedLanguage(name);
+    }
+
 }

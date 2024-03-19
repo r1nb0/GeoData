@@ -91,4 +91,9 @@ public class CountryController {
         return new ResponseEntity<>(objects, HttpStatus.OK);
     }
 
+    @GetMapping("/info/countries_from_language/{languageName}")
+    public List<Country> getCountriesFromLanguage(@PathVariable String languageName){
+        return countryService.findAllCountriesContainingSpecifiedLanguage(languageName);
+    }
+
 }

@@ -24,4 +24,6 @@ public interface CountryService {
 
     Country updateInfo(CountryDTO countryDTO);
 
+    List<Country> findAllCountriesContainingSpecifiedLanguage(String name);
+
 }
