@@ -8,7 +8,7 @@ public class CityDTO {
 
     private Integer id;
 
-    private String cityName;
+    private String name;
 
     private Integer countryId;
 

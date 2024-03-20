@@ -65,7 +65,7 @@ public class CityServiceImpl implements CityService {
         Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
         if (country.isPresent()) {
             City city = City.builder()
-                    .name(cityDTO.getCityName())
+                    .name(cityDTO.getName())
                     .latitude(cityDTO.getLatitude())
                     .longitude(cityDTO.getLongitude())
                     .country(country.get())
@@ -103,8 +103,8 @@ public class CityServiceImpl implements CityService {
             if (cityDTO.getLongitude() != null) {
                 city.get().setLongitude(cityDTO.getLongitude());
             }
-            if (cityDTO.getCityName() != null) {
-                city.get().setName(cityDTO.getCityName());
+            if (cityDTO.getName() != null) {
+                city.get().setName(cityDTO.getName());
             }
             City saveCity = cityRepository.save(city.get());
             countryCache.remove(saveCity.getCountry().getId());
