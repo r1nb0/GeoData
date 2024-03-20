@@ -48,7 +48,7 @@ public class CountryController {
         }
     }
 
-    @PutMapping("update_info")
+    @PutMapping("/update_info")
     public ResponseEntity<Country> updateInfo(@RequestBody CountryDTO countryDTO){
         Country updateCountry = countryService.updateInfo(countryDTO);
         if (updateCountry == null) {
@@ -75,6 +75,11 @@ public class CountryController {
         return new ResponseEntity<>(updateCountry, HttpStatus.OK);
     }
 
+    @GetMapping("/info/countries_from_language/{languageName}")
+    public List<Country> getCountriesFromLanguage(@PathVariable String languageName){
+        return countryService.findAllCountriesContainingSpecifiedLanguage(languageName);
+    }
+
     @GetMapping("/distance/{firstId}+{secondId}")
     public ResponseEntity<Object> distance(@PathVariable Integer firstId, @PathVariable Integer secondId){
         Optional<Country> first = countryService.findById(firstId);
@@ -89,11 +94,6 @@ public class CountryController {
                 second.get().getLatitude(), second.get().getLongitude());
         objects.put("Distance", distance.toString() + "km");
         return new ResponseEntity<>(objects, HttpStatus.OK);
-    }
-
-    @GetMapping("/info/countries_from_language/{languageName}")
-    public List<Country> getCountriesFromLanguage(@PathVariable String languageName){
-        return countryService.findAllCountriesContainingSpecifiedLanguage(languageName);
     }
 
 }
