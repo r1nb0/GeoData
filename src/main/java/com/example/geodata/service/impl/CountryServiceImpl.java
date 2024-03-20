@@ -10,6 +10,8 @@ import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.repository.LanguageRepository;
 import com.example.geodata.service.CountryService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -24,6 +26,7 @@ public class CountryServiceImpl implements CountryService {
     private final LanguageRepository languageRepository;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
+    private static final Logger logger = LoggerFactory.getLogger(CountryService.class);
 
     @Override
     public List<Country> getAll() {
@@ -35,7 +38,13 @@ public class CountryServiceImpl implements CountryService {
         Optional<Country> country = countryCache.get(id);
         if (country.isEmpty()){
             country = countryRepository.findById(id);
-            country.ifPresent(value -> countryCache.put(value.getId(), value));
+            if (country.isEmpty()){
+                return Optional.empty();
+            }
+            countryCache.put(country.get().getId(), country.get());
+            logger.info("Country with id = {} retrieved from repository and added into the cache", id);
+        }else{
+            logger.info("Country with id = {} retrieved from cache", id);
         }
         return country;
     }

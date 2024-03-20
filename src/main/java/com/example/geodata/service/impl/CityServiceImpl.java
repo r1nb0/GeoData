@@ -9,6 +9,8 @@ import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.service.CityService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +25,7 @@ public class CityServiceImpl implements CityService {
     private final CountryRepository countryRepository;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
+    private static final Logger logger = LoggerFactory.getLogger(CityService.class);
 
     @Override
     public List<City> getAll() {
@@ -46,7 +49,13 @@ public class CityServiceImpl implements CityService {
         Optional<City> city = cityCache.get(id);
         if (city.isEmpty()){
             city = cityRepository.findById(id);
-            city.ifPresent(value -> cityCache.put(value.getId(), value));
+            if(city.isEmpty()){
+                return Optional.empty();
+            }
+            cityCache.put(city.get().getId(), city.get());
+            logger.info("City with id = {} retrieved from repository and added into the cache", id);
+        }else{
+            logger.info("City with id = {} retrieved from cache", id);
         }
         return city;
     }
