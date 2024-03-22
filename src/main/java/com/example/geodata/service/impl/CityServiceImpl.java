@@ -47,14 +47,14 @@ public class CityServiceImpl implements CityService {
     @Override
     public Optional<City> findById(Integer id) {
         Optional<City> city = cityCache.get(id);
-        if (city.isEmpty()){
+        if (city.isEmpty()) {
             city = cityRepository.findById(id);
-            if(city.isEmpty()){
+            if (city.isEmpty()) {
                 return Optional.empty();
             }
             cityCache.put(city.get().getId(), city.get());
             logger.info("City with id = {} retrieved from repository and added into the cache", id);
-        }else{
+        } else {
             logger.info("City with id = {} retrieved from cache", id);
         }
         return city;
@@ -80,17 +80,17 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public City replaceCountry(CityDTO cityDTO) {
-       Optional<City> city = cityRepository.findById(cityDTO.getId());
-       if (city.isPresent()) {
-           Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
-           if (country.isPresent()) {
-               city.get().setCountry(country.get());
-               City saveCity = cityRepository.save(city.get());
-               cityCache.put(saveCity.getId(), saveCity);
-               countryCache.remove(saveCity.getCountry().getId());
-           }
-       }
-       return null;
+        Optional<City> city = cityRepository.findById(cityDTO.getId());
+        if (city.isPresent()) {
+            Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
+            if (country.isPresent()) {
+                city.get().setCountry(country.get());
+                City saveCity = cityRepository.save(city.get());
+                cityCache.put(saveCity.getId(), saveCity);
+                countryCache.remove(saveCity.getCountry().getId());
+            }
+        }
+        return null;
     }
 
     @Override
