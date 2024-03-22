@@ -4,9 +4,6 @@ package com.example.geodata.contoller;
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
 import com.example.geodata.service.CountryService;
-import com.example.geodata.service.DistanceService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +18,6 @@ import java.util.Optional;
 public class CountryController {
 
     private final CountryService countryService;
-    private final DistanceService distanceService;
 
     @GetMapping("/all")
     public List<Country> getAll(){
@@ -78,22 +74,6 @@ public class CountryController {
     @GetMapping("/info/countries_from_language/{languageName}")
     public List<Country> getCountriesFromLanguage(@PathVariable String languageName){
         return countryService.findAllCountriesContainingSpecifiedLanguage(languageName);
-    }
-
-    @GetMapping("/distance/{firstId}+{secondId}")
-    public ResponseEntity<Object> distance(@PathVariable Integer firstId, @PathVariable Integer secondId){
-        Optional<Country> first = countryService.findById(firstId);
-        Optional<Country> second = countryService.findById(secondId);
-        if (first.isEmpty() || second.isEmpty())
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode objects = objectMapper.createObjectNode();
-        objects.put("First country", first.get().getName());
-        objects.put("Second country", second.get().getName());
-        Double distance = distanceService.calculateDistance(first.get().getLatitude(), second.get().getLongitude(),
-                second.get().getLatitude(), second.get().getLongitude());
-        objects.put("Distance", distance.toString() + "km");
-        return new ResponseEntity<>(objects, HttpStatus.OK);
     }
 
 }

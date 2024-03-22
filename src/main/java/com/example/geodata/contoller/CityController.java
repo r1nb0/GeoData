@@ -3,9 +3,6 @@ package com.example.geodata.contoller;
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
 import com.example.geodata.service.CityService;
-import com.example.geodata.service.DistanceService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +17,6 @@ import java.util.Optional;
 public class CityController {
 
     private final CityService cityService;
-    private final DistanceService distanceService;
 
     @GetMapping("/all")
     public List<City> getAll(){
@@ -67,22 +63,6 @@ public class CityController {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(city, HttpStatus.OK);
-    }
-
-    @GetMapping("/distance/{firstId}+{secondId}")
-    public ResponseEntity<Object> distance(@PathVariable Integer firstId, @PathVariable Integer secondId){
-        Optional<City> first = cityService.findById(firstId);
-        Optional<City> second = cityService.findById(secondId);
-        if (first.isEmpty() || second.isEmpty())
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode objects = objectMapper.createObjectNode();
-        objects.put("First city", first.get().getName());
-        objects.put("Second city", second.get().getName());
-        Double distance = distanceService.calculateDistance(first.get().getLatitude(), second.get().getLongitude(),
-                second.get().getLatitude(), second.get().getLongitude());
-        objects.put("Distance", distance.toString() + "km");
-        return new ResponseEntity<>(objects, HttpStatus.OK);
     }
 
 }
