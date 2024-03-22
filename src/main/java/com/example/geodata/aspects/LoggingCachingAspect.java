@@ -20,21 +20,23 @@ public class LoggingCachingAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingCachingAspect.class);
 
-    @Pointcut("execution(* com.example.geodata.cache.impl.*.*(..))")
+    private final String cachePointcut = "execution(* com.example.geodata.cache.impl.*.*(..))";
+
+    @Pointcut(cachePointcut)
     public void loggingCache(){
 
     }
 
     @Before("loggingCache()")
-    public void beginTransaction(JoinPoint joinPoint) {
+    public void beginCaching(JoinPoint joinPoint) {
         String args = Arrays.stream(joinPoint.getArgs())
                 .map(Object::toString)
                 .collect(Collectors.joining(", "));
-        logger.info("Caching method: {}. Args: [{}]", joinPoint, args);
+        logger.info("Caching method: {}. Args: [{}]", joinPoint.getSignature(), args);
     }
 
     @AfterReturning(pointcut = "loggingCache()", returning = "obj")
-    public Object afterReturningCallAt(Optional<?> obj){
+    public Object afterCaching(Optional<?> obj){
         if (obj.isEmpty()){
             logger.info("Cache is not contains this object. " +
                     "The object will be retrieved from the repository.");

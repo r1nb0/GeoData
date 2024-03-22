@@ -1,7 +1,6 @@
 package com.example.geodata.aspects;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,10 +18,9 @@ import java.util.stream.Collectors;
 
 @Aspect
 @Component
-@Log4j2
-public class LoggingAspect {
+public class LoggingAPIAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoggingAPIAspect.class);
 
     private final String apiPointcut = "execution(* com.example.geodata.controller.*.*(..))";
 
@@ -44,7 +42,7 @@ public class LoggingAspect {
 
     @AfterThrowing(value = exceptionPointcut, throwing = "exception")
     public void logsExceptionsFromAnyLocation(JoinPoint joinPoint, Throwable exception) {
-        logger.info("Error in the method : {}. Error message : {}", joinPoint, exception.getMessage());
+        logger.error("Error in the method : {}. Error message : {}", joinPoint.getSignature(), exception.getMessage());
     }
 
 }
