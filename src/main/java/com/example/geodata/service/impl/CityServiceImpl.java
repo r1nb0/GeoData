@@ -62,12 +62,12 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public City addCityWithExistingCountry(CityDTO cityDTO) {
-        Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
+        Optional<Country> country = countryRepository.findById(cityDTO.countryId());
         if (country.isPresent()) {
             City city = City.builder()
-                    .name(cityDTO.getName())
-                    .latitude(cityDTO.getLatitude())
-                    .longitude(cityDTO.getLongitude())
+                    .name(cityDTO.name())
+                    .latitude(cityDTO.latitude())
+                    .longitude(cityDTO.longitude())
                     .country(country.get())
                     .build();
             city = cityRepository.save(city);
@@ -80,9 +80,9 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public City replaceCountry(CityDTO cityDTO) {
-        Optional<City> city = cityRepository.findById(cityDTO.getId());
+        Optional<City> city = cityRepository.findById(cityDTO.id());
         if (city.isPresent()) {
-            Optional<Country> country = countryRepository.findById(cityDTO.getCountryId());
+            Optional<Country> country = countryRepository.findById(cityDTO.countryId());
             if (country.isPresent()) {
                 city.get().setCountry(country.get());
                 City saveCity = cityRepository.save(city.get());
@@ -95,16 +95,16 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public City update(CityDTO cityDTO) {
-        Optional<City> city = cityRepository.findById(cityDTO.getId());
+        Optional<City> city = cityRepository.findById(cityDTO.id());
         if (city.isPresent()) {
-            if (cityDTO.getLatitude() != null) {
-                city.get().setLatitude(cityDTO.getLatitude());
+            if (cityDTO.latitude() != null) {
+                city.get().setLatitude(cityDTO.latitude());
             }
-            if (cityDTO.getLongitude() != null) {
-                city.get().setLongitude(cityDTO.getLongitude());
+            if (cityDTO.longitude() != null) {
+                city.get().setLongitude(cityDTO.longitude());
             }
-            if (cityDTO.getName() != null) {
-                city.get().setName(cityDTO.getName());
+            if (cityDTO.name() != null) {
+                city.get().setName(cityDTO.name());
             }
             City saveCity = cityRepository.save(city.get());
             countryCache.remove(saveCity.getCountry().getId());

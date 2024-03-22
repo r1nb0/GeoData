@@ -52,12 +52,12 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Country addCountryWithExistingLanguages(CountryDTO countryDTO) {
-        List<Language> languages = languageRepository.findByNames(countryDTO.getLanguages());
+        List<Language> languages = languageRepository.findByNames(countryDTO.languages());
         Country country = Country.builder()
-                .name(countryDTO.getName())
-                .nationality(countryDTO.getNationality())
-                .latitude(countryDTO.getLatitude())
-                .longitude(countryDTO.getLongitude())
+                .name(countryDTO.name())
+                .nationality(countryDTO.nationality())
+                .latitude(countryDTO.latitude())
+                .longitude(countryDTO.longitude())
                 .languages(new HashSet<>())
                 .cities(new ArrayList<>())
                 .build();
@@ -85,9 +85,9 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
         public Country addLanguage(CountryDTO countryDTO) {
-            Optional<Country> country = countryRepository.findById(countryDTO.getId());
+            Optional<Country> country = countryRepository.findById(countryDTO.id());
             if (country.isPresent()){
-                List<Language> languageExist = languageRepository.findByNames(countryDTO.getLanguages());
+                List<Language> languageExist = languageRepository.findByNames(countryDTO.languages());
                 for (Language language : languageExist){
                     country.get().addLanguage(language);
                 }
@@ -100,9 +100,9 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Country deleteLanguage(CountryDTO countryDTO){
-        Optional<Country> country = countryRepository.findById(countryDTO.getId());
+        Optional<Country> country = countryRepository.findById(countryDTO.id());
         if (country.isPresent()) {
-            List<Language> languages = languageRepository.findByNames(countryDTO.getLanguages());
+            List<Language> languages = languageRepository.findByNames(countryDTO.languages());
             for (Language language : languages) {
                 country.get().removeLanguage(language);
             }
@@ -115,19 +115,19 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Country updateInfo(CountryDTO countryDTO) {
-        Optional<Country> country = countryRepository.findById(countryDTO.getId());
+        Optional<Country> country = countryRepository.findById(countryDTO.id());
         if (country.isPresent()) {
-            if (countryDTO.getLongitude() != null) {
-                country.get().setLongitude(countryDTO.getLongitude());
+            if (countryDTO.longitude() != null) {
+                country.get().setLongitude(countryDTO.longitude());
             }
-            if (countryDTO.getLatitude() != null) {
-                country.get().setLatitude(countryDTO.getLatitude());
+            if (countryDTO.latitude() != null) {
+                country.get().setLatitude(countryDTO.latitude());
             }
-            if (countryDTO.getNationality() != null) {
-                country.get().setNationality(countryDTO.getNationality());
+            if (countryDTO.nationality() != null) {
+                country.get().setNationality(countryDTO.nationality());
             }
-            if (countryDTO.getName() != null) {
-                country.get().setName(countryDTO.getName());
+            if (countryDTO.name() != null) {
+                country.get().setName(countryDTO.name());
             }
             Country saveCountry = countryRepository.save(country.get());
             countryCache.put(saveCountry.getId(), saveCountry);

@@ -33,9 +33,9 @@ public class LanguageServiceImpl implements LanguageService {
     @Override
     public Language save(LanguageDTO languageDTO) {
         Language language = Language.builder()
-                .name(languageDTO.getName())
+                .name(languageDTO.name())
                 .countries(new ArrayList<>())
-                .code(languageDTO.getCode())
+                .code(languageDTO.code())
                 .build();
         language = languageRepository.save(language);
         languageCache.put(language.getId(), language);
@@ -44,15 +44,15 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public Language update(LanguageDTO languageDTO) {
-        Optional<Language> language = languageRepository.findById(languageDTO.getId());
+        Optional<Language> language = languageRepository.findById(languageDTO.id());
         if (language.isEmpty()){
             return null;
         }
-        if (languageDTO.getCode() != null){
-            language.get().setCode(languageDTO.getCode());
+        if (languageDTO.code() != null){
+            language.get().setCode(languageDTO.code());
         }
-        if (languageDTO.getName() != null){
-            language.get().setName(languageDTO.getName());
+        if (languageDTO.name() != null){
+            language.get().setName(languageDTO.name());
         }
         Language saveLanguage = languageRepository.save(language.get());
         for (Country country : saveLanguage.getCountries()){
