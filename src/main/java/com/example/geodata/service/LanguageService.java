@@ -16,7 +16,7 @@ public interface LanguageService {
 
     Language update(LanguageDTO languageDTO);
 
-    Boolean deleteById(Integer id);
+    void deleteById(Integer id);
 
     Optional<Language> findById(Integer id);
 

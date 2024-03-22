@@ -16,7 +16,7 @@ public interface CountryService {
 
     Country addCountryWithExistingLanguages(CountryDTO countryDTO);
 
-    Boolean deleteCountryById(Integer id);
+    void deleteCountryById(Integer id);
 
     Country deleteLanguage(CountryDTO countryDTO);
 

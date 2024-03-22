@@ -12,7 +12,7 @@ public interface CityService {
 
     List<City> getAll();
 
-    Boolean deleteById(Integer id);
+    void deleteById(Integer id);
 
     Optional<City> findById(Integer id);
 
