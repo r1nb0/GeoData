@@ -1,8 +1,9 @@
-package com.example.geodata.contoller;
+package com.example.geodata.controller;
 
-import com.example.geodata.entity.Language;
 import com.example.geodata.dto.LanguageDTO;
+import com.example.geodata.entity.Language;
 import com.example.geodata.service.LanguageService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,12 @@ public class LanguageController {
     }
 
     @GetMapping("/info/{id}")
-    Optional<Language> getById(@PathVariable Integer id){
-        return languageService.findById(id);
+    ResponseEntity<Optional<Language>> getById(@PathVariable Integer id){
+        try {
+            return ResponseEntity.ok(languageService.findById(id));
+        }catch(EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PostMapping("/create")
@@ -35,11 +40,11 @@ public class LanguageController {
 
     @DeleteMapping("/delete/{idLanguage}")
     HttpStatus deleteLanguage(@PathVariable Integer idLanguage){
-        Boolean isExist = languageService.deleteById(idLanguage);
-        if (Boolean.TRUE.equals(isExist)){
+        try {
+            languageService.deleteById(idLanguage);
             return HttpStatus.OK;
-        }else{
-            return HttpStatus.BAD_REQUEST;
+        }catch(EntityNotFoundException e){
+            return HttpStatus.NOT_FOUND;
         }
     }
 

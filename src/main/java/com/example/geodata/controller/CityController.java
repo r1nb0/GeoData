@@ -1,8 +1,9 @@
-package com.example.geodata.contoller;
+package com.example.geodata.controller;
 
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
 import com.example.geodata.service.CityService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,12 @@ public class CityController {
     }
 
     @GetMapping("/info/{cityId}")
-    public Optional<City> findById(@PathVariable Integer cityId){
-        return cityService.findById(cityId);
+    public ResponseEntity<Optional<City>> findById(@PathVariable Integer cityId){
+        try {
+            return ResponseEntity.ok(cityService.findById(cityId));
+        }catch(EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PostMapping("/create")
@@ -39,11 +44,11 @@ public class CityController {
 
     @DeleteMapping("/delete/{cityId}")
     public HttpStatus deleteCityById(@PathVariable Integer cityId){
-        Boolean isExist = cityService.deleteById(cityId);
-        if (Boolean.TRUE.equals(isExist)) {
+        try {
+            cityService.deleteById(cityId);
             return HttpStatus.OK;
-        }else{
-            return HttpStatus.BAD_REQUEST;
+        }catch(EntityNotFoundException e){
+            return HttpStatus.NOT_FOUND;
         }
     }
 

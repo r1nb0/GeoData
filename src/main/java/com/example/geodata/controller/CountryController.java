@@ -1,9 +1,10 @@
-package com.example.geodata.contoller;
+package com.example.geodata.controller;
 
 
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
 import com.example.geodata.service.CountryService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,12 @@ public class CountryController {
     }
 
     @GetMapping("/info/{id}")
-    public Optional<Country> findById(@PathVariable Integer id){
-        return countryService.findById(id);
+    public ResponseEntity<Optional<Country>> findById(@PathVariable Integer id){
+        try {
+            return ResponseEntity.ok(countryService.findById(id));
+        }catch(EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PostMapping("/create")
@@ -36,11 +41,11 @@ public class CountryController {
 
     @DeleteMapping("/delete/{id}")
     public HttpStatus deleteCountryById(@PathVariable Integer id){
-        Boolean isExist = countryService.deleteCountryById(id);
-        if (Boolean.TRUE.equals(isExist)){
+        try {
+            countryService.deleteCountryById(id);
             return HttpStatus.OK;
-        }else{
-            return HttpStatus.BAD_REQUEST;
+        }catch(EntityNotFoundException e){
+            return HttpStatus.NOT_FOUND;
         }
     }
 

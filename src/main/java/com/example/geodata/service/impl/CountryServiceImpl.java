@@ -9,9 +9,8 @@ import com.example.geodata.entity.Language;
 import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.repository.LanguageRepository;
 import com.example.geodata.service.CountryService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ public class CountryServiceImpl implements CountryService {
     private final LanguageRepository languageRepository;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
-    private static final Logger logger = LoggerFactory.getLogger(CountryService.class);
 
     @Override
     public List<Country> getAll() {
@@ -38,14 +36,11 @@ public class CountryServiceImpl implements CountryService {
     public Optional<Country> findById(Integer id) {
         Optional<Country> country = countryCache.get(id);
         if (country.isEmpty()){
-            country = countryRepository.findById(id);
-            if (country.isEmpty()){
-                return Optional.empty();
-            }
-            countryCache.put(country.get().getId(), country.get());
-            logger.info("Country with id = {} retrieved from repository and added into the cache", id);
-        }else{
-            logger.info("Country with id = {} retrieved from cache", id);
+            country = Optional.ofNullable(countryRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Country with id = " + id + " not found."
+                    )));
+            country.ifPresent(value -> countryCache.put(value.getId(), value));
         }
         return country;
     }
@@ -70,17 +65,18 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Boolean deleteCountryById(Integer id) {
-        Optional<Country> country = countryRepository.findById(id);
+    public void deleteCountryById(Integer id) {
+        Optional<Country> country = Optional.ofNullable(countryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Country with id = " + id + " not found."
+                )));
         if (country.isPresent()) {
             countryCache.remove(id);
             for (City city : country.get().getCities()){
                 cityCache.remove(city.getId());
             }
             countryRepository.delete(country.get());
-            return true;
         }
-        return false;
     }
 
     @Override
