@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+
 @Entity
 @Table(name = "cities")
 @NoArgsConstructor
@@ -30,5 +31,11 @@ public class City {
 
     @Column(name = "longitude")
     private Double longitude;
+
+    @Override
+    public String toString() {
+        return "name=" + name + ", " + "id=" + id + ", " +
+                "latitude=" + latitude + ", " + "longitude=" + longitude;
+    }
 
 }

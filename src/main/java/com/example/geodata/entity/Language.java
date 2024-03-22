@@ -29,4 +29,10 @@ public class Language {
     @JsonBackReference
     List<Country> countries = new ArrayList<>();
 
+    @Override
+    public String toString(){
+        return "id=" + id + ", " + "name=" + name + ", " +
+                "code=" + code;
+    }
+
 }

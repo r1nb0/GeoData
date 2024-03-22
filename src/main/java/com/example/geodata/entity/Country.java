@@ -41,13 +41,19 @@ public class Country {
                 inverseJoinColumns = { @JoinColumn(name = "language_id") })
     @JsonManagedReference
     Set<Language> languages = new HashSet<>();
-
     public void addLanguage(Language language){
        languages.add(language);
-   }
+    }
 
     public void removeLanguage(Language language) {
        languages.remove(language);
    }
+
+    @Override
+    public String toString(){
+        return "id=" + id + ", " + "name=" + name + ", " +
+                "nationality=" + nationality + ", " + "latitude=" + latitude + ", " +
+                "longitude=" + longitude;
+    }
 
 }
