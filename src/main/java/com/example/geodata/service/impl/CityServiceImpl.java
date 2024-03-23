@@ -34,7 +34,7 @@ public class CityServiceImpl implements CityService {
     public void deleteById(Integer id) {
         Optional<City> city = Optional.ofNullable(cityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "City with id = " + id + " not found."
+                        "City with id :: " + id + " not found."
                 )));
         if (city.isPresent()) {
             cityCache.remove(id);
@@ -49,7 +49,7 @@ public class CityServiceImpl implements CityService {
         if (city.isEmpty()) {
             city = Optional.ofNullable(cityRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "City with id = " + id + " not found.")));
+                            "City with id :: " + id + " not found.")));
             if (city.isEmpty()) {
                 return Optional.empty();
             }

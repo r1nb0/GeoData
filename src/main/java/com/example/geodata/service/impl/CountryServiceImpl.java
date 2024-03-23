@@ -38,7 +38,7 @@ public class CountryServiceImpl implements CountryService {
         if (country.isEmpty()){
             country = Optional.ofNullable(countryRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "Country with id = " + id + " not found."
+                            "Country with id :: " + id + " not found."
                     )));
             country.ifPresent(value -> countryCache.put(value.getId(), value));
         }
@@ -68,7 +68,7 @@ public class CountryServiceImpl implements CountryService {
     public void deleteCountryById(Integer id) {
         Optional<Country> country = Optional.ofNullable(countryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Country with id = " + id + " not found."
+                        "Country with id :: " + id + " not found."
                 )));
         if (country.isPresent()) {
             countryCache.remove(id);

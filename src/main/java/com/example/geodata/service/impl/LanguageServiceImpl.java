@@ -64,7 +64,7 @@ public class LanguageServiceImpl implements LanguageService {
     public void deleteById(Integer id) {
         Optional<Language> language = Optional.ofNullable(findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Language with id = " + id + " not found."
+                        "Language with id :: " + id + " not found."
                 )));
         if (language.isPresent()) {
             List<Integer> countriesIds = languageRepository.deleteLanguageByIdAndReturnCountryIds(id);
@@ -82,7 +82,7 @@ public class LanguageServiceImpl implements LanguageService {
         if (language.isEmpty()){
             language = Optional.ofNullable(languageRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "Language with id = " + id + " not found."
+                            "Language with id :: " + id + " not found."
                     )));
             if (language.isEmpty()){
                 return Optional.empty();
