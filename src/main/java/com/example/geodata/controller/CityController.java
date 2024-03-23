@@ -1,5 +1,6 @@
 package com.example.geodata.controller;
 
+import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
 import com.example.geodata.service.CityService;
@@ -25,6 +26,7 @@ public class CityController {
     }
 
     @GetMapping("/info/{cityId}")
+    @AspectAnnotation
     public ResponseEntity<Optional<City>> findById(@PathVariable Integer cityId){
         try {
             return ResponseEntity.ok(cityService.findById(cityId));
@@ -34,6 +36,7 @@ public class CityController {
     }
 
     @PostMapping("/create")
+    @AspectAnnotation
     public ResponseEntity<City> addCity(@RequestBody CityDTO cityDTO){
         City existCity = cityService.addCityWithExistingCountry(cityDTO);
         if (existCity == null){
@@ -43,6 +46,7 @@ public class CityController {
     }
 
     @DeleteMapping("/delete/{cityId}")
+    @AspectAnnotation
     public HttpStatus deleteCityById(@PathVariable Integer cityId){
         try {
             cityService.deleteById(cityId);
@@ -53,6 +57,7 @@ public class CityController {
     }
 
     @PutMapping("/change_country")
+    @AspectAnnotation
     public ResponseEntity<City> changeCountry(@RequestBody CityDTO cityDTO){
         City city = cityService.replaceCountry(cityDTO);
         if (city == null){
@@ -62,6 +67,7 @@ public class CityController {
     }
 
     @PutMapping("/update_info")
+    @AspectAnnotation
     public ResponseEntity<City> updateInfo(@RequestBody CityDTO cityDTO){
         City city = cityService.update(cityDTO);
         if (city == null){

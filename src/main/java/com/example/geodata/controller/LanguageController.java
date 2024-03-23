@@ -1,5 +1,6 @@
 package com.example.geodata.controller;
 
+import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.dto.LanguageDTO;
 import com.example.geodata.entity.Language;
 import com.example.geodata.service.LanguageService;
@@ -20,11 +21,13 @@ public class LanguageController {
     private final LanguageService languageService;
 
     @GetMapping("/all")
+    @AspectAnnotation
     ResponseEntity<List<Language>> getAll(){
         return new ResponseEntity<>(languageService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/info/{id}")
+    @AspectAnnotation
     ResponseEntity<Optional<Language>> getById(@PathVariable Integer id){
         try {
             return ResponseEntity.ok(languageService.findById(id));
@@ -34,11 +37,13 @@ public class LanguageController {
     }
 
     @PostMapping("/create")
+    @AspectAnnotation
     ResponseEntity<Language> addLanguage(@RequestBody LanguageDTO languageDTO){
         return new ResponseEntity<>(languageService.save(languageDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{idLanguage}")
+    @AspectAnnotation
     HttpStatus deleteLanguage(@PathVariable Integer idLanguage){
         try {
             languageService.deleteById(idLanguage);
@@ -49,6 +54,7 @@ public class LanguageController {
     }
 
     @PutMapping("/update_info")
+    @AspectAnnotation
     ResponseEntity<Language> updateInfo(@RequestBody LanguageDTO languageDTO){
         Language language = languageService.update(languageDTO);
         if (language == null){

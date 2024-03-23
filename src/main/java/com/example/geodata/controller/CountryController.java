@@ -1,6 +1,7 @@
 package com.example.geodata.controller;
 
 
+import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
 import com.example.geodata.service.CountryService;
@@ -26,6 +27,7 @@ public class CountryController {
     }
 
     @GetMapping("/info/{id}")
+    @AspectAnnotation
     public ResponseEntity<Optional<Country>> findById(@PathVariable Integer id){
         try {
             return ResponseEntity.ok(countryService.findById(id));
@@ -35,11 +37,13 @@ public class CountryController {
     }
 
     @PostMapping("/create")
+    @AspectAnnotation
     public ResponseEntity<Country> addCountry(@RequestBody CountryDTO countryDTO){
         return new ResponseEntity<>(countryService.addCountryWithExistingLanguages(countryDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
+    @AspectAnnotation
     public HttpStatus deleteCountryById(@PathVariable Integer id){
         try {
             countryService.deleteCountryById(id);
@@ -50,6 +54,7 @@ public class CountryController {
     }
 
     @PutMapping("/update_info")
+    @AspectAnnotation
     public ResponseEntity<Country> updateInfo(@RequestBody CountryDTO countryDTO){
         Country updateCountry = countryService.updateInfo(countryDTO);
         if (updateCountry == null) {
@@ -59,6 +64,7 @@ public class CountryController {
     }
 
     @PutMapping("/add_languages")
+    @AspectAnnotation
     public ResponseEntity<Country> addLanguages(@RequestBody CountryDTO countryDTO){
         Country updateCountry = countryService.addLanguage(countryDTO);
         if (updateCountry == null) {
@@ -68,6 +74,7 @@ public class CountryController {
     }
 
     @PutMapping("/delete_languages")
+    @AspectAnnotation
     public ResponseEntity<Country> deleteLanguages(@RequestBody CountryDTO countryDTO){
         Country updateCountry = countryService.deleteLanguage(countryDTO);
         if (updateCountry == null) {

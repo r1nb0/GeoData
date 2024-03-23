@@ -1,5 +1,6 @@
 package com.example.geodata.service.impl;
 
+import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.cache.LRUCacheCity;
 import com.example.geodata.dto.CountryDTO;
@@ -33,6 +34,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
+    @AspectAnnotation
     public Optional<Country> findById(Integer id) {
         Optional<Country> country = countryCache.get(id);
         if (country.isEmpty()){
@@ -46,6 +48,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
+    @AspectAnnotation
     public Country addCountryWithExistingLanguages(CountryDTO countryDTO) {
         List<Language> languages = languageRepository.findByNames(countryDTO.languages());
         Country country = Country.builder()
@@ -65,6 +68,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
+    @AspectAnnotation
     public void deleteCountryById(Integer id) {
         Optional<Country> country = Optional.ofNullable(countryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -80,6 +84,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
+    @AspectAnnotation
         public Country addLanguage(CountryDTO countryDTO) {
             Optional<Country> country = countryRepository.findById(countryDTO.id());
             if (country.isPresent()){
@@ -95,6 +100,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
+    @AspectAnnotation
     public Country deleteLanguage(CountryDTO countryDTO){
         Optional<Country> country = countryRepository.findById(countryDTO.id());
         if (country.isPresent()) {
@@ -110,6 +116,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
+    @AspectAnnotation
     public Country updateInfo(CountryDTO countryDTO) {
         Optional<Country> country = countryRepository.findById(countryDTO.id());
         if (country.isPresent()) {

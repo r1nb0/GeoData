@@ -1,4 +1,6 @@
 package com.example.geodata.cache.impl;
+
+import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.cache.Cache;
 
 import java.util.HashMap;
@@ -20,6 +22,7 @@ public class LRUCache<K, V> implements Cache<K, V> {
     }
 
     @Override
+    @AspectAnnotation
     public Optional<V> get(K key) {
         Optional<V> result = Optional.empty();
         if (containsKey(key)){
@@ -37,6 +40,7 @@ public class LRUCache<K, V> implements Cache<K, V> {
     }
 
     @Override
+    @AspectAnnotation
     public void put(K key, V value) {
         if (containsKey(key)){
             linkedList.remove(hashMap.get(key));

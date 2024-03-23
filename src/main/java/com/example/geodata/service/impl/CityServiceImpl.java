@@ -1,5 +1,6 @@
 package com.example.geodata.service.impl;
 
+import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.cache.LRUCacheCity;
 import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.entity.Country;
@@ -31,6 +32,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @AspectAnnotation
     public void deleteById(Integer id) {
         Optional<City> city = Optional.ofNullable(cityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -44,6 +46,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @AspectAnnotation
     public Optional<City> findById(Integer id) {
         Optional<City> city = cityCache.get(id);
         if (city.isEmpty()) {
@@ -59,6 +62,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @AspectAnnotation
     public City addCityWithExistingCountry(CityDTO cityDTO) {
         Optional<Country> country = countryRepository.findById(cityDTO.countryId());
         if (country.isPresent()) {
@@ -77,6 +81,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @AspectAnnotation
     public City replaceCountry(CityDTO cityDTO) {
         Optional<City> city = cityRepository.findById(cityDTO.id());
         if (city.isPresent()) {
@@ -92,6 +97,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @AspectAnnotation
     public City update(CityDTO cityDTO) {
         Optional<City> city = cityRepository.findById(cityDTO.id());
         if (city.isPresent()) {

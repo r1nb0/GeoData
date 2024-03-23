@@ -18,13 +18,17 @@ public class LoggingAspect {
 
     @Pointcut("within(com.example.geodata.controller..*)" +
             " || within(com.example.geodata.service..*)" +
-            " || within(com.example.geodata.repository..*)" +
             " || within(com.example.geodata.cache..*)")
-    public void loggingController() {
+    public void allMethods() {
 
     }
 
-    @Around("loggingController()")
+    @Pointcut("@annotation(AspectAnnotation)")
+    public void methodsWithAspectAnnotation() {
+
+    }
+
+    @Around("methodsWithAspectAnnotation()")
     public Object logEnteringAPI(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("Enter: {}.{}() with argument[s] = {}", joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName(), Arrays.toString(joinPoint.getArgs()));
@@ -40,7 +44,7 @@ public class LoggingAspect {
         }
     }
 
-    @AfterThrowing(pointcut = "loggingController()", throwing = "exception")
+    @AfterThrowing(pointcut = "allMethods()", throwing = "exception")
     public void logsExceptionsFromAnyLocation(JoinPoint joinPoint, Throwable exception) {
         log.error("Exception in : {}.{}() cause = {}", joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName(), exception.getMessage());

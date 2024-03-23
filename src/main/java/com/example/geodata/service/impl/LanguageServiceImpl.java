@@ -1,5 +1,6 @@
 package com.example.geodata.service.impl;
 
+import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.cache.LRUCacheLanguage;
 import com.example.geodata.entity.Country;
@@ -29,6 +30,7 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
+    @AspectAnnotation
     public Language save(LanguageDTO languageDTO) {
         Language language = Language.builder()
                 .name(languageDTO.name())
@@ -41,6 +43,7 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
+    @AspectAnnotation
     public Language update(LanguageDTO languageDTO) {
         Optional<Language> language = languageRepository.findById(languageDTO.id());
         if (language.isEmpty()){
@@ -61,6 +64,7 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
+    @AspectAnnotation
     public void deleteById(Integer id) {
         Optional<Language> language = Optional.ofNullable(findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -77,6 +81,7 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
+    @AspectAnnotation
     public Optional<Language> findById(Integer id) {
         Optional<Language> language = languageCache.get(id);
         if (language.isEmpty()){
