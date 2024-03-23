@@ -21,7 +21,8 @@ public class City {
     @Column(name = "city_name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "fk_cities_countries")
     @JsonBackReference
     private Country country;
@@ -34,8 +35,8 @@ public class City {
 
     @Override
     public String toString() {
-        return "name=" + name + ", " + "id=" + id + ", " +
-                "latitude=" + latitude + ", " + "longitude=" + longitude;
+        return "name=" + name + ", " + "id=" + id + ", "
+                + "latitude=" + latitude + ", " + "longitude=" + longitude;
     }
 
 }

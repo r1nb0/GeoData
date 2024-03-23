@@ -25,14 +25,14 @@ public class Language {
     @Column(name = "language_code")
     private String code;
 
-    @ManyToMany(mappedBy = "languages", cascade = { CascadeType.MERGE, CascadeType.PERSIST }, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "languages", cascade = { CascadeType.MERGE, CascadeType.PERSIST },
+            fetch = FetchType.LAZY)
     @JsonBackReference
-    List<Country> countries = new ArrayList<>();
+    private List<Country> countries = new ArrayList<>();
 
     @Override
-    public String toString(){
-        return "id=" + id + ", " + "name=" + name + ", " +
-                "code=" + code;
+    public String toString() {
+        return "id=" + id + ", " + "name=" + name + ", " + "code=" + code;
     }
 
 }

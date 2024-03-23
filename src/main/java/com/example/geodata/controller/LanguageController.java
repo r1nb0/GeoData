@@ -22,42 +22,42 @@ public class LanguageController {
 
     @GetMapping("/all")
     @AspectAnnotation
-    ResponseEntity<List<Language>> getAll(){
+    ResponseEntity<List<Language>> getAll() {
         return new ResponseEntity<>(languageService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/info/{id}")
     @AspectAnnotation
-    ResponseEntity<Optional<Language>> getById(@PathVariable Integer id){
+    ResponseEntity<Optional<Language>> getById(@PathVariable final Integer id) {
         try {
             return ResponseEntity.ok(languageService.findById(id));
-        }catch(EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     @PostMapping("/create")
     @AspectAnnotation
-    ResponseEntity<Language> addLanguage(@RequestBody LanguageDTO languageDTO){
+    ResponseEntity<Language> addLanguage(@RequestBody final LanguageDTO languageDTO) {
         return new ResponseEntity<>(languageService.save(languageDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{idLanguage}")
     @AspectAnnotation
-    HttpStatus deleteLanguage(@PathVariable Integer idLanguage){
+    HttpStatus deleteLanguage(@PathVariable final Integer idLanguage) {
         try {
             languageService.deleteById(idLanguage);
             return HttpStatus.OK;
-        }catch(EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             return HttpStatus.NOT_FOUND;
         }
     }
 
     @PutMapping("/update_info")
     @AspectAnnotation
-    ResponseEntity<Language> updateInfo(@RequestBody LanguageDTO languageDTO){
+    ResponseEntity<Language> updateInfo(@RequestBody final LanguageDTO languageDTO) {
         Language language = languageService.update(languageDTO);
-        if (language == null){
+        if (language == null) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(language, HttpStatus.OK);

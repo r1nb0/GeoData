@@ -16,9 +16,9 @@ import java.util.Arrays;
 @Slf4j
 public class LoggingAspect {
 
-    @Pointcut("within(com.example.geodata.controller..*)" +
-            " || within(com.example.geodata.service..*)" +
-            " || within(com.example.geodata.cache..*)")
+    @Pointcut("within(com.example.geodata.controller..*)"
+            + " || within(com.example.geodata.service..*)"
+            + " || within(com.example.geodata.cache..*)")
     public void allMethods() {
 
     }
@@ -29,7 +29,7 @@ public class LoggingAspect {
     }
 
     @Around("methodsWithAspectAnnotation()")
-    public Object logEnteringAPI(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object logEnteringAPI(final ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("Enter: {}.{}() with argument[s] = {}", joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName(), Arrays.toString(joinPoint.getArgs()));
         try {
@@ -37,7 +37,7 @@ public class LoggingAspect {
             log.info("Exit: {}.{}() with result = {}", joinPoint.getSignature().getDeclaringTypeName(),
                     joinPoint.getSignature().getName(), result);
             return result;
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             log.error("Illegal argument: {} in {}.{}()", Arrays.toString(joinPoint.getArgs()),
                     joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
             throw e;
@@ -45,7 +45,7 @@ public class LoggingAspect {
     }
 
     @AfterThrowing(pointcut = "allMethods()", throwing = "exception")
-    public void logsExceptionsFromAnyLocation(JoinPoint joinPoint, Throwable exception) {
+    public void logsExceptionsFromAnyLocation(JoinPoint joinPoint, final Throwable exception) {
         log.error("Exception in : {}.{}() cause = {}", joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName(), exception.getMessage());
     }

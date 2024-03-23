@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping("/api/v2/cities")
 @AllArgsConstructor
@@ -21,25 +22,25 @@ public class CityController {
     private final CityService cityService;
 
     @GetMapping("/all")
-    public List<City> getAll(){
+    public List<City> getAll() {
         return cityService.getAll();
     }
 
     @GetMapping("/info/{cityId}")
     @AspectAnnotation
-    public ResponseEntity<Optional<City>> findById(@PathVariable Integer cityId){
+    public ResponseEntity<Optional<City>> findById(@PathVariable final Integer cityId) {
         try {
             return ResponseEntity.ok(cityService.findById(cityId));
-        }catch(EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     @PostMapping("/create")
     @AspectAnnotation
-    public ResponseEntity<City> addCity(@RequestBody CityDTO cityDTO){
+    public ResponseEntity<City> addCity(@RequestBody final CityDTO cityDTO) {
         City existCity = cityService.addCityWithExistingCountry(cityDTO);
-        if (existCity == null){
+        if (existCity == null) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(existCity, HttpStatus.OK);
@@ -47,20 +48,20 @@ public class CityController {
 
     @DeleteMapping("/delete/{cityId}")
     @AspectAnnotation
-    public HttpStatus deleteCityById(@PathVariable Integer cityId){
+    public HttpStatus deleteCityById(@PathVariable final Integer cityId) {
         try {
             cityService.deleteById(cityId);
             return HttpStatus.OK;
-        }catch(EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             return HttpStatus.NOT_FOUND;
         }
     }
 
     @PutMapping("/change_country")
     @AspectAnnotation
-    public ResponseEntity<City> changeCountry(@RequestBody CityDTO cityDTO){
+    public ResponseEntity<City> changeCountry(@RequestBody final CityDTO cityDTO) {
         City city = cityService.replaceCountry(cityDTO);
-        if (city == null){
+        if (city == null) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(city, HttpStatus.OK);
@@ -68,9 +69,9 @@ public class CityController {
 
     @PutMapping("/update_info")
     @AspectAnnotation
-    public ResponseEntity<City> updateInfo(@RequestBody CityDTO cityDTO){
+    public ResponseEntity<City> updateInfo(@RequestBody final CityDTO cityDTO) {
         City city = cityService.update(cityDTO);
-        if (city == null){
+        if (city == null) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(city, HttpStatus.OK);

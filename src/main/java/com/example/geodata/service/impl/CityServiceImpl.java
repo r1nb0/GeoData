@@ -33,7 +33,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @AspectAnnotation
-    public void deleteById(Integer id) {
+    public void deleteById(final Integer id) {
         Optional<City> city = Optional.ofNullable(cityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "City with id :: " + id + " not found."
@@ -47,7 +47,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @AspectAnnotation
-    public Optional<City> findById(Integer id) {
+    public Optional<City> findById(final Integer id) {
         Optional<City> city = cityCache.get(id);
         if (city.isEmpty()) {
             city = Optional.ofNullable(cityRepository.findById(id)
@@ -63,7 +63,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @AspectAnnotation
-    public City addCityWithExistingCountry(CityDTO cityDTO) {
+    public City addCityWithExistingCountry(final CityDTO cityDTO) {
         Optional<Country> country = countryRepository.findById(cityDTO.countryId());
         if (country.isPresent()) {
             City city = City.builder()
@@ -82,7 +82,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @AspectAnnotation
-    public City replaceCountry(CityDTO cityDTO) {
+    public City replaceCountry(final CityDTO cityDTO) {
         Optional<City> city = cityRepository.findById(cityDTO.id());
         if (city.isPresent()) {
             Optional<Country> country = countryRepository.findById(cityDTO.countryId());
@@ -98,7 +98,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @AspectAnnotation
-    public City update(CityDTO cityDTO) {
+    public City update(final CityDTO cityDTO) {
         Optional<City> city = cityRepository.findById(cityDTO.id());
         if (city.isPresent()) {
             if (cityDTO.latitude() != null) {
