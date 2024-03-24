@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LRUCacheCountry extends LRUCache<Integer, Country> {
 
-    public LRUCacheCountry(@Value("${LRUCache.capacity}") int capacity) {
+    public LRUCacheCountry(@Value("${LRUCache.capacity}") final int capacity) {
         super(capacity);
     }
 

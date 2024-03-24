@@ -2,6 +2,7 @@ package com.example.geodata.service;
 
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
+import com.example.geodata.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,15 +13,20 @@ public interface CityService {
 
     List<City> getAll();
 
-    Boolean deleteById(Integer id);
+    void deleteById(Integer id)
+            throws ResourceNotFoundException;
 
-    Optional<City> findById(Integer id);
+    Optional<City> findById(Integer id)
+            throws ResourceNotFoundException;
 
-    City addCityWithExistingCountry(CityDTO cityDTO);
+    City addCity(CityDTO cityDTO)
+            throws ResourceNotFoundException;
 
-    City replaceCountry(CityDTO cityDTO);
+    City replaceCountry(CityDTO cityDTO)
+            throws ResourceNotFoundException;
 
-    City update(CityDTO cityDTO);
+    City update(CityDTO cityDTO)
+            throws ResourceNotFoundException;
 
 
 }

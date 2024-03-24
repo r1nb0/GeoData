@@ -2,6 +2,7 @@ package com.example.geodata.service;
 
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
+import com.example.geodata.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,18 +13,23 @@ public interface CountryService {
 
     List<Country> getAll();
 
-    Optional<Country> findById(Integer id);
+    Optional<Country> findById(Integer id)
+            throws ResourceNotFoundException;
 
-    Country addCountryWithExistingLanguages(CountryDTO countryDTO);
+    Country addCountry(CountryDTO countryDTO);
 
-    Boolean deleteCountryById(Integer id);
+    void deleteCountryById(Integer id)
+            throws ResourceNotFoundException;
 
-    Country deleteLanguage(CountryDTO countryDTO);
+    Country deleteLanguage(CountryDTO countryDTO)
+            throws ResourceNotFoundException;
 
-    Country addLanguage(CountryDTO countryDTO);
+    Country addLanguage(CountryDTO countryDTO)
+            throws ResourceNotFoundException;
 
-    Country updateInfo(CountryDTO countryDTO);
+    Country updateInfo(CountryDTO countryDTO)
+            throws ResourceNotFoundException;
 
-    List<Country> findAllCountriesContainingSpecifiedLanguage(String name);
+    List<Country> findCountriesWithSpecifiedLanguage(String name);
 
 }

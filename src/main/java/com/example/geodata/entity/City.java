@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+
 @Entity
 @Table(name = "cities")
 @NoArgsConstructor
@@ -20,7 +21,8 @@ public class City {
     @Column(name = "city_name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "fk_cities_countries")
     @JsonBackReference
     private Country country;
@@ -30,5 +32,11 @@ public class City {
 
     @Column(name = "longitude")
     private Double longitude;
+
+    @Override
+    public String toString() {
+        return "name=" + name + ", " + "id=" + id + ", "
+                + "latitude=" + latitude + ", " + "longitude=" + longitude;
+    }
 
 }

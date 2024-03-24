@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LRUCacheCity extends LRUCache<Integer, City>{
+public class LRUCacheCity extends LRUCache<Integer, City> {
 
-    public LRUCacheCity(@Value("${LRUCache.capacity}") int capacity) {
+    public LRUCacheCity(@Value("${LRUCache.capacity}") final int capacity) {
         super(capacity);
     }
 

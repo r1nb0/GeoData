@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LRUCacheLanguage extends LRUCache<Integer, Language>{
+public class LRUCacheLanguage extends LRUCache<Integer, Language> {
 
-    public LRUCacheLanguage(@Value("${LRUCache.capacity}") int capacity) {
+    public LRUCacheLanguage(@Value("${LRUCache.capacity}") final int capacity) {
         super(capacity);
     }
 
