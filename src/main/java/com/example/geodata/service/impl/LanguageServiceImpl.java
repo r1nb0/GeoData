@@ -24,6 +24,8 @@ public class LanguageServiceImpl implements LanguageService {
     private final LanguageRepository languageRepository;
     private final LRUCacheCountry countryCache;
     private final LRUCacheLanguage languageCache;
+    private final String NOT_FOUND = "not found";
+    private final String LANGUAGE_WITH_ID = "Language with id::";
 
     @Override
     public List<Language> findAll() {
@@ -55,8 +57,7 @@ public class LanguageServiceImpl implements LanguageService {
         Optional<Language> language = languageRepository
                 .findById(languageDTO.id());
         if (language.isEmpty()) {
-            throw new ResourceNotFoundException("Language with id :: "
-                    + languageDTO.id() + " not found.");
+            throw new ResourceNotFoundException(LANGUAGE_WITH_ID + " " + languageDTO.id() + " " + NOT_FOUND);
         }
         if (languageDTO.code() != null) {
             language.get().setCode(languageDTO.code());
@@ -86,8 +87,7 @@ public class LanguageServiceImpl implements LanguageService {
             languageCache.remove(id);
             languageRepository.deleteById(id);
         } else {
-            throw new ResourceNotFoundException("Language with id :: "
-                    + id + " not found.");
+            throw new ResourceNotFoundException(LANGUAGE_WITH_ID + " " + id + " " + NOT_FOUND);
         }
     }
 
@@ -99,8 +99,7 @@ public class LanguageServiceImpl implements LanguageService {
         if (language.isEmpty()) {
             language = languageRepository.findById(id);
             if (language.isEmpty()) {
-                throw new ResourceNotFoundException("Language with id :: "
-                        + id + " not found.");
+                throw new ResourceNotFoundException(LANGUAGE_WITH_ID + " " + id + " " + NOT_FOUND);
             }
             languageCache.put(language.get().getId(), language.get());
         }
