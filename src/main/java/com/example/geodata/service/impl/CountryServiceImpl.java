@@ -28,6 +28,8 @@ public class CountryServiceImpl implements CountryService {
     private final LanguageRepository languageRepository;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
+    private final String NOT_FOUND = "not found";
+    private final String COUNTRY_WITH_ID = "Country with id ::";
 
     @Override
     public List<Country> getAll() {
@@ -42,8 +44,7 @@ public class CountryServiceImpl implements CountryService {
         if (country.isEmpty()) {
             country = countryRepository.findById(id);
             if (country.isEmpty()) {
-                throw new ResourceNotFoundException("Country with id :: "
-                        + id + " not found.");
+                throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + id + " " + NOT_FOUND);
             }
             country.ifPresent(value -> countryCache.put(value.getId(), value));
         }
@@ -55,7 +56,8 @@ public class CountryServiceImpl implements CountryService {
     public Country addCountry(final CountryDTO countryDTO) {
         List<Language> languages = languageRepository
                 .findByNames(countryDTO.languages());
-        if (countryRepository.existsByName(countryDTO.name())) {
+        if (Boolean.TRUE.equals(countryRepository
+                .existsByName(countryDTO.name()))) {
             throw new BadRequestException("Country with name :: "
                     + countryDTO.name() + " is already exist.");
         }
@@ -94,8 +96,7 @@ public class CountryServiceImpl implements CountryService {
             }
             countryRepository.delete(country.get());
         }
-        throw new ResourceNotFoundException("Country with id :: "
-                + id + " not found.");
+        throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + id + " " + NOT_FOUND);
     }
 
     @Override
@@ -119,8 +120,7 @@ public class CountryServiceImpl implements CountryService {
                 countryCache.put(country.get().getId(), country.get());
                 return country.get();
             }
-            throw new ResourceNotFoundException("Country with id :: "
-                    + countryDTO.id() + " not found.");
+            throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + countryDTO.id() + " " + NOT_FOUND);
     }
 
     @Override
@@ -144,8 +144,7 @@ public class CountryServiceImpl implements CountryService {
             countryCache.put(country.get().getId(), country.get());
             return country.get();
         }
-        throw new ResourceNotFoundException("Country with id :: "
-                + countryDTO.id() + " not found.");
+        throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + countryDTO.id() + " " + NOT_FOUND);
     }
 
     @Override
@@ -170,8 +169,7 @@ public class CountryServiceImpl implements CountryService {
             countryCache.put(country.get().getId(), country.get());
             return country.get();
         }
-        throw new ResourceNotFoundException("Country with id :: "
-                + countryDTO.id() + " not found.");
+        throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + countryDTO.id() + " " + NOT_FOUND);
     }
 
     @Override

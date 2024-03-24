@@ -26,6 +26,8 @@ public class CityServiceImpl implements CityService {
     private final CountryRepository countryRepository;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
+    private final String NOT_FOUND = "not found";
+    private final String CITY_WITH_ID = "City with id::";
 
     @Override
     public List<City> getAll() {
@@ -42,8 +44,7 @@ public class CityServiceImpl implements CityService {
             countryCache.remove(city.get().getCountry().getId());
             cityRepository.delete(city.get());
         } else {
-            throw new ResourceNotFoundException("City with id :: "
-                    + id + " not found.");
+            throw new ResourceNotFoundException(CITY_WITH_ID + " " + id + " " + NOT_FOUND);
         }
     }
 
@@ -55,8 +56,7 @@ public class CityServiceImpl implements CityService {
         if (city.isEmpty()) {
             city = cityRepository.findById(id);
             if (city.isEmpty()) {
-                throw new ResourceNotFoundException("City with id :: "
-                        + id + " not found.");
+                throw new ResourceNotFoundException(CITY_WITH_ID + " " + id + " " + NOT_FOUND);
             }
             cityCache.put(city.get().getId(), city.get());
         }
@@ -111,8 +111,7 @@ public class CityServiceImpl implements CityService {
                         + cityDTO.countryName() + " not found.");
             }
         } else {
-            throw new ResourceNotFoundException("City with id :: "
-                    + cityDTO.id() + " not found.");
+            throw new ResourceNotFoundException(CITY_WITH_ID + " " + cityDTO.id() + " " + NOT_FOUND);
         }
     }
 
@@ -135,8 +134,7 @@ public class CityServiceImpl implements CityService {
             cityCache.put(city.get().getId(), city.get());
             return city.get();
         } else {
-            throw new ResourceNotFoundException("City with id :: "
-                    + cityDTO.id() + " not found.");
+            throw new ResourceNotFoundException(CITY_WITH_ID + " " + cityDTO.id() + " " + NOT_FOUND);
         }
     }
 
