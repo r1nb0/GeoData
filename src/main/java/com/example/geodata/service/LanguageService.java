@@ -2,6 +2,7 @@ package com.example.geodata.service;
 
 import com.example.geodata.entity.Language;
 import com.example.geodata.dto.LanguageDTO;
+import com.example.geodata.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +15,13 @@ public interface LanguageService {
 
     Language save(LanguageDTO language);
 
-    Language update(LanguageDTO languageDTO);
+    Language update(LanguageDTO languageDTO)
+            throws ResourceNotFoundException;
 
-    void deleteById(Integer id);
+    void deleteById(Integer id)
+            throws ResourceNotFoundException;
 
-    Optional<Language> findById(Integer id);
+    Optional<Language> findById(Integer id)
+            throws ResourceNotFoundException;
 
 }

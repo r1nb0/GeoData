@@ -3,8 +3,9 @@ package com.example.geodata.controller;
 import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
+import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.service.CityService;
-import jakarta.persistence.EntityNotFoundException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-
+@Tag(name = "CityController")
 @RestController
-@RequestMapping("/api/v2/cities")
+@RequestMapping("/api/v1/cities")
 @AllArgsConstructor
 public class CityController {
 
@@ -28,52 +29,39 @@ public class CityController {
 
     @GetMapping("/info/{cityId}")
     @AspectAnnotation
-    public ResponseEntity<Optional<City>> findById(@PathVariable final Integer cityId) {
-        try {
-            return ResponseEntity.ok(cityService.findById(cityId));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ResponseEntity<Optional<City>> findById(@PathVariable final Integer cityId)
+            throws ResourceNotFoundException {
+        return ResponseEntity.ok(cityService.findById(cityId));
     }
 
     @PostMapping("/create")
     @AspectAnnotation
-    public ResponseEntity<City> addCity(@RequestBody final CityDTO cityDTO) {
-        City existCity = cityService.addCityWithExistingCountry(cityDTO);
-        if (existCity == null) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(existCity, HttpStatus.OK);
+    public ResponseEntity<City> addCity(@RequestBody final CityDTO cityDTO)
+            throws ResourceNotFoundException {
+        return new ResponseEntity<>(cityService.addCity(cityDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{cityId}")
     @AspectAnnotation
-    public HttpStatus deleteCityById(@PathVariable final Integer cityId) {
-        try {
-            cityService.deleteById(cityId);
-            return HttpStatus.OK;
-        } catch (EntityNotFoundException e) {
-            return HttpStatus.NOT_FOUND;
-        }
+    public HttpStatus deleteCityById(@PathVariable final Integer cityId)
+            throws ResourceNotFoundException {
+        cityService.deleteById(cityId);
+        return HttpStatus.OK;
     }
 
-    @PutMapping("/change_country")
+    @PutMapping("/changeCountry")
     @AspectAnnotation
-    public ResponseEntity<City> changeCountry(@RequestBody final CityDTO cityDTO) {
+    public ResponseEntity<City> changeCountry(@RequestBody final CityDTO cityDTO)
+            throws ResourceNotFoundException {
         City city = cityService.replaceCountry(cityDTO);
-        if (city == null) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
         return new ResponseEntity<>(city, HttpStatus.OK);
     }
 
-    @PutMapping("/update_info")
+    @PutMapping("/updateInfo")
     @AspectAnnotation
-    public ResponseEntity<City> updateInfo(@RequestBody final CityDTO cityDTO) {
+    public ResponseEntity<City> updateInfo(@RequestBody final CityDTO cityDTO)
+            throws ResourceNotFoundException {
         City city = cityService.update(cityDTO);
-        if (city == null) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
         return new ResponseEntity<>(city, HttpStatus.OK);
     }
 

@@ -2,6 +2,7 @@ package com.example.geodata.cache.impl;
 
 import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.cache.Cache;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -11,12 +12,14 @@ public class LRUCache<K, V> implements Cache<K, V> {
 
     private final int capacity;
 
-    protected HashMap<K, Node<K, V>> hashMap;
+    @Getter
+    private HashMap<K, Node<K, V>> hashMap;
 
-    protected LinkedList<Node<K, V>> linkedList;
+    @Getter
+    private LinkedList<Node<K, V>> linkedList;
 
-    public LRUCache(final int capacity) {
-        this.capacity = capacity;
+    public LRUCache(final int maxSize) {
+        this.capacity = maxSize;
         hashMap = new HashMap<>();
         linkedList = new LinkedList<>();
     }

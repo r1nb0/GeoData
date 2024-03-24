@@ -3,8 +3,9 @@ package com.example.geodata.controller;
 import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
+import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.service.CountryService;
-import jakarta.persistence.EntityNotFoundException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "CountryController")
 @RestController
-@RequestMapping("/api/v2/countries")
+@RequestMapping("/api/v1/countries")
 @AllArgsConstructor
 public class CountryController {
 
@@ -27,64 +29,56 @@ public class CountryController {
 
     @GetMapping("/info/{id}")
     @AspectAnnotation
-    public ResponseEntity<Optional<Country>> findById(@PathVariable final Integer id) {
-        try {
-            return ResponseEntity.ok(countryService.findById(id));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ResponseEntity<Optional<Country>> findById(@PathVariable final Integer id)
+            throws ResourceNotFoundException {
+        return ResponseEntity.ok(countryService.findById(id));
     }
 
     @PostMapping("/create")
     @AspectAnnotation
     public ResponseEntity<Country> addCountry(@RequestBody final CountryDTO countryDTO) {
-        return new ResponseEntity<>(countryService.addCountryWithExistingLanguages(countryDTO), HttpStatus.OK);
+        Country country = countryService.addCountry(countryDTO);
+        if (country == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return new ResponseEntity<>(country, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     @AspectAnnotation
-    public HttpStatus deleteCountryById(@PathVariable Integer id) {
-        try {
-            countryService.deleteCountryById(id);
-            return HttpStatus.OK;
-        } catch (EntityNotFoundException e) {
-            return HttpStatus.NOT_FOUND;
-        }
+    public HttpStatus deleteCountryById(@PathVariable final Integer id)
+            throws ResourceNotFoundException {
+        countryService.deleteCountryById(id);
+        return HttpStatus.OK;
     }
 
-    @PutMapping("/update_info")
+    @PutMapping("/updateInfo")
     @AspectAnnotation
-    public ResponseEntity<Country> updateInfo(@RequestBody final CountryDTO countryDTO) {
-        Country updateCountry = countryService.updateInfo(countryDTO);
-        if (updateCountry == null) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(updateCountry, HttpStatus.OK);
+    public ResponseEntity<Country> updateInfo(@RequestBody final CountryDTO countryDTO)
+            throws ResourceNotFoundException {
+        return new ResponseEntity<>(countryService.updateInfo(countryDTO),
+                HttpStatus.OK);
     }
 
-    @PutMapping("/add_languages")
+    @PutMapping("/addLanguages")
     @AspectAnnotation
-    public ResponseEntity<Country> addLanguages(@RequestBody final CountryDTO countryDTO) {
-        Country updateCountry = countryService.addLanguage(countryDTO);
-        if (updateCountry == null) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(updateCountry, HttpStatus.OK);
+    public ResponseEntity<Country> addLanguages(@RequestBody final CountryDTO countryDTO)
+            throws ResourceNotFoundException {
+        return new ResponseEntity<>(countryService.addLanguage(countryDTO),
+                HttpStatus.OK);
     }
 
-    @PutMapping("/delete_languages")
+    @PutMapping("/removeLanguages")
     @AspectAnnotation
-    public ResponseEntity<Country> deleteLanguages(@RequestBody final CountryDTO countryDTO) {
-        Country updateCountry = countryService.deleteLanguage(countryDTO);
-        if (updateCountry == null) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(updateCountry, HttpStatus.OK);
+    public ResponseEntity<Country> deleteLanguages(@RequestBody final CountryDTO countryDTO)
+            throws ResourceNotFoundException {
+        return new ResponseEntity<>(countryService.deleteLanguage(countryDTO),
+                HttpStatus.OK);
     }
 
-    @GetMapping("/info/countries_from_language/{languageName}")
+    @GetMapping("/info/countriesFromLanguage/{languageName}")
     public List<Country> getCountriesFromLanguage(@PathVariable final String languageName) {
-        return countryService.findAllCountriesContainingSpecifiedLanguage(languageName);
+        return countryService.findCountriesWithSpecifiedLanguage(languageName);
     }
 
 }

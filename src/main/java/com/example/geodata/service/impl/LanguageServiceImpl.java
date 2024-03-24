@@ -3,12 +3,13 @@ package com.example.geodata.service.impl;
 import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.cache.LRUCacheLanguage;
+import com.example.geodata.dto.LanguageDTO;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
-import com.example.geodata.dto.LanguageDTO;
+import com.example.geodata.exceptions.BadRequestException;
+import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.LanguageRepository;
 import com.example.geodata.service.LanguageService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +32,17 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     @AspectAnnotation
-    public Language save(LanguageDTO languageDTO) {
+    public Language save(final LanguageDTO languageDTO) {
         Language language = Language.builder()
                 .name(languageDTO.name())
                 .countries(new ArrayList<>())
                 .code(languageDTO.code())
                 .build();
+        if (languageDTO.name() == null || languageDTO.code() == null) {
+            throw new BadRequestException("All fields: "
+                    + "[name, code]"
+                    + "must be provided.");
+        }
         language = languageRepository.save(language);
         languageCache.put(language.getId(), language);
         return language;
@@ -44,53 +50,57 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     @AspectAnnotation
-    public Language update(LanguageDTO languageDTO) {
-        Optional<Language> language = languageRepository.findById(languageDTO.id());
-        if (language.isEmpty()){
-            return null;
+    public Language update(final LanguageDTO languageDTO)
+            throws ResourceNotFoundException {
+        Optional<Language> language = languageRepository
+                .findById(languageDTO.id());
+        if (language.isEmpty()) {
+            throw new ResourceNotFoundException("Language with id :: "
+                    + languageDTO.id() + " not found.");
         }
-        if (languageDTO.code() != null){
+        if (languageDTO.code() != null) {
             language.get().setCode(languageDTO.code());
         }
-        if (languageDTO.name() != null){
+        if (languageDTO.name() != null) {
             language.get().setName(languageDTO.name());
         }
-        Language saveLanguage = languageRepository.save(language.get());
-        for (Country country : saveLanguage.getCountries()){
+        language = Optional.of(languageRepository.save(language.get()));
+        for (Country country : language.get().getCountries()) {
             countryCache.remove(country.getId());
         }
-        languageCache.put(saveLanguage.getId(), saveLanguage);
-        return saveLanguage;
+        languageCache.put(language.get().getId(), language.get());
+        return language.get();
     }
 
     @Override
     @AspectAnnotation
-    public void deleteById(Integer id) {
-        Optional<Language> language = Optional.ofNullable(findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Language with id :: " + id + " not found."
-                )));
+    public void deleteById(final Integer id)
+            throws ResourceNotFoundException {
+        Optional<Language> language = languageRepository.findById(id);
         if (language.isPresent()) {
-            List<Integer> countriesIds = languageRepository.deleteLanguageByIdAndReturnCountryIds(id);
-            for (Integer countryId : countriesIds){
+            List<Integer> countriesIds = languageRepository
+                    .deleteLanguageByIdAndReturnCountryIds(id);
+            for (Integer countryId : countriesIds) {
                 countryCache.remove(countryId);
             }
             languageCache.remove(id);
             languageRepository.deleteById(id);
+        } else {
+            throw new ResourceNotFoundException("Language with id :: "
+                    + id + " not found.");
         }
     }
 
     @Override
     @AspectAnnotation
-    public Optional<Language> findById(Integer id) {
+    public Optional<Language> findById(final Integer id)
+            throws ResourceNotFoundException {
         Optional<Language> language = languageCache.get(id);
-        if (language.isEmpty()){
-            language = Optional.ofNullable(languageRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Language with id :: " + id + " not found."
-                    )));
-            if (language.isEmpty()){
-                return Optional.empty();
+        if (language.isEmpty()) {
+            language = languageRepository.findById(id);
+            if (language.isEmpty()) {
+                throw new ResourceNotFoundException("Language with id :: "
+                        + id + " not found.");
             }
             languageCache.put(language.get().getId(), language.get());
         }

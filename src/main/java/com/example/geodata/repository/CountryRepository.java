@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CountryRepository extends JpaRepository<Country, Integer> {
@@ -16,5 +17,9 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
             + "JOIN languages l ON cl.language_id = l.id "
             + "WHERE l.language_name = (?1)", nativeQuery = true)
     List<Country> findAllCountriesContainingSpecifiedLanguage(@Param("1") String name);
+
+    Optional<Country> findCountryByName(String name);
+
+    Boolean existsByName(String name);
 
 }

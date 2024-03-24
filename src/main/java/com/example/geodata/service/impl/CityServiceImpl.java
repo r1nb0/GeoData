@@ -3,13 +3,14 @@ package com.example.geodata.service.impl;
 import com.example.geodata.aspects.AspectAnnotation;
 import com.example.geodata.cache.LRUCacheCity;
 import com.example.geodata.cache.LRUCacheCountry;
-import com.example.geodata.entity.Country;
 import com.example.geodata.dto.CityDTO;
 import com.example.geodata.entity.City;
+import com.example.geodata.entity.Country;
+import com.example.geodata.exceptions.BadRequestException;
+import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.service.CityService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,28 +34,29 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @AspectAnnotation
-    public void deleteById(final Integer id) {
-        Optional<City> city = Optional.ofNullable(cityRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "City with id :: " + id + " not found."
-                )));
+    public void deleteById(final Integer id)
+            throws ResourceNotFoundException {
+        Optional<City> city = cityRepository.findById(id);
         if (city.isPresent()) {
             cityCache.remove(id);
             countryCache.remove(city.get().getCountry().getId());
             cityRepository.delete(city.get());
+        } else {
+            throw new ResourceNotFoundException("City with id :: "
+                    + id + " not found.");
         }
     }
 
     @Override
     @AspectAnnotation
-    public Optional<City> findById(final Integer id) {
+    public Optional<City> findById(final Integer id)
+            throws ResourceNotFoundException {
         Optional<City> city = cityCache.get(id);
         if (city.isEmpty()) {
-            city = Optional.ofNullable(cityRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "City with id :: " + id + " not found.")));
+            city = cityRepository.findById(id);
             if (city.isEmpty()) {
-                return Optional.empty();
+                throw new ResourceNotFoundException("City with id :: "
+                        + id + " not found.");
             }
             cityCache.put(city.get().getId(), city.get());
         }
@@ -63,9 +65,17 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @AspectAnnotation
-    public City addCityWithExistingCountry(final CityDTO cityDTO) {
-        Optional<Country> country = countryRepository.findById(cityDTO.countryId());
+    public City addCity(final CityDTO cityDTO)
+            throws ResourceNotFoundException {
+        Optional<Country> country = countryRepository
+                .findCountryByName(cityDTO.countryName());
         if (country.isPresent()) {
+            if (cityDTO.name() == null || cityDTO.longitude() == null
+                    || cityDTO.latitude() == null) {
+                throw new BadRequestException("All fields: "
+                        + "[name, latitude, longitude]"
+                        + "must be provided.");
+            }
             City city = City.builder()
                     .name(cityDTO.name())
                     .latitude(cityDTO.latitude())
@@ -76,29 +86,39 @@ public class CityServiceImpl implements CityService {
             cityCache.put(city.getId(), city);
             countryCache.remove(city.getCountry().getId());
             return city;
+        } else {
+            throw new ResourceNotFoundException("Country with name :: "
+                    + cityDTO.countryName() + " not found.");
         }
-        return null;
     }
 
     @Override
     @AspectAnnotation
-    public City replaceCountry(final CityDTO cityDTO) {
+    public City replaceCountry(final CityDTO cityDTO)
+            throws ResourceNotFoundException {
         Optional<City> city = cityRepository.findById(cityDTO.id());
         if (city.isPresent()) {
-            Optional<Country> country = countryRepository.findById(cityDTO.countryId());
+            Optional<Country> country = countryRepository
+                    .findCountryByName(cityDTO.countryName());
             if (country.isPresent()) {
                 city.get().setCountry(country.get());
-                City saveCity = cityRepository.save(city.get());
-                cityCache.put(saveCity.getId(), saveCity);
-                countryCache.remove(saveCity.getCountry().getId());
+                city = Optional.of(cityRepository.save(city.get()));
+                cityCache.put(city.get().getId(), city.get());
+                countryCache.remove(city.get().getCountry().getId());
+                return city.get();
+            } else {
+                throw new ResourceNotFoundException("Country with name :: "
+                        + cityDTO.countryName() + " not found.");
             }
+        } else {
+            throw new ResourceNotFoundException("City with id :: "
+                    + cityDTO.id() + " not found.");
         }
-        return null;
     }
 
     @Override
     @AspectAnnotation
-    public City update(final CityDTO cityDTO) {
+    public City update(final CityDTO cityDTO) throws ResourceNotFoundException {
         Optional<City> city = cityRepository.findById(cityDTO.id());
         if (city.isPresent()) {
             if (cityDTO.latitude() != null) {
@@ -110,12 +130,14 @@ public class CityServiceImpl implements CityService {
             if (cityDTO.name() != null) {
                 city.get().setName(cityDTO.name());
             }
-            City saveCity = cityRepository.save(city.get());
-            countryCache.remove(saveCity.getCountry().getId());
-            cityCache.put(saveCity.getId(), saveCity);
-            return saveCity;
+            city = Optional.of(cityRepository.save(city.get()));
+            countryCache.remove(city.get().getCountry().getId());
+            cityCache.put(city.get().getId(), city.get());
+            return city.get();
+        } else {
+            throw new ResourceNotFoundException("City with id :: "
+                    + cityDTO.id() + " not found.");
         }
-        return null;
     }
 
 }

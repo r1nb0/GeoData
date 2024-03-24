@@ -1,16 +1,17 @@
 package com.example.geodata.service.impl;
 
 import com.example.geodata.aspects.AspectAnnotation;
-import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.cache.LRUCacheCity;
+import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.City;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
+import com.example.geodata.exceptions.BadRequestException;
+import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.repository.LanguageRepository;
 import com.example.geodata.service.CountryService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +36,15 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     @AspectAnnotation
-    public Optional<Country> findById(final Integer id) {
+    public Optional<Country> findById(final Integer id)
+            throws ResourceNotFoundException {
         Optional<Country> country = countryCache.get(id);
         if (country.isEmpty()) {
-            country = Optional.ofNullable(countryRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Country with id :: " + id + " not found."
-                    )));
+            country = countryRepository.findById(id);
+            if (country.isEmpty()) {
+                throw new ResourceNotFoundException("Country with id :: "
+                        + id + " not found.");
+            }
             country.ifPresent(value -> countryCache.put(value.getId(), value));
         }
         return country;
@@ -49,8 +52,20 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     @AspectAnnotation
-    public Country addCountryWithExistingLanguages(final CountryDTO countryDTO) {
-        List<Language> languages = languageRepository.findByNames(countryDTO.languages());
+    public Country addCountry(final CountryDTO countryDTO) {
+        List<Language> languages = languageRepository
+                .findByNames(countryDTO.languages());
+        if (countryRepository.existsByName(countryDTO.name())) {
+            throw new BadRequestException("Country with name :: "
+                    + countryDTO.name() + " is already exist.");
+        }
+        if (countryDTO.name() == null || countryDTO.longitude() == null
+                || countryDTO.latitude() == null
+                || countryDTO.nationality() == null) {
+            throw new BadRequestException("All fields: "
+                    + "[name, nationality, latitude, longitude]"
+                    + "must be provided.");
+        }
         Country country = Country.builder()
                 .name(countryDTO.name())
                 .nationality(countryDTO.nationality())
@@ -69,11 +84,9 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     @AspectAnnotation
-    public void deleteCountryById(final Integer id) {
-        Optional<Country> country = Optional.ofNullable(countryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Country with id :: " + id + " not found."
-                )));
+    public void deleteCountryById(final Integer id)
+            throws ResourceNotFoundException {
+        Optional<Country> country = countryRepository.findById(id);
         if (country.isPresent()) {
             countryCache.remove(id);
             for (City city : country.get().getCities()) {
@@ -81,43 +94,64 @@ public class CountryServiceImpl implements CountryService {
             }
             countryRepository.delete(country.get());
         }
+        throw new ResourceNotFoundException("Country with id :: "
+                + id + " not found.");
     }
 
     @Override
     @AspectAnnotation
-        public Country addLanguage(final CountryDTO countryDTO) {
-            Optional<Country> country = countryRepository.findById(countryDTO.id());
+        public Country addLanguage(final CountryDTO countryDTO)
+            throws ResourceNotFoundException {
+            Optional<Country> country =
+                    countryRepository.findById(countryDTO.id());
             if (country.isPresent()) {
-                List<Language> languageExist = languageRepository.findByNames(countryDTO.languages());
+                List<Language> languageExist = languageRepository
+                        .findByNames(countryDTO.languages());
+                if (languageExist.isEmpty()) {
+                    throw new BadRequestException("List of languages"
+                            + " for adding is empty"
+                            + " or these languages don't exist.");
+                }
                 for (Language language : languageExist) {
                     country.get().addLanguage(language);
                 }
-                Country saveCountry = countryRepository.save(country.get());
-                countryCache.put(saveCountry.getId(), saveCountry);
-                return saveCountry;
+                country = Optional.of(countryRepository.save(country.get()));
+                countryCache.put(country.get().getId(), country.get());
+                return country.get();
             }
-            return null;
+            throw new ResourceNotFoundException("Country with id :: "
+                    + countryDTO.id() + " not found.");
     }
 
     @Override
     @AspectAnnotation
-    public Country deleteLanguage(final CountryDTO countryDTO) {
-        Optional<Country> country = countryRepository.findById(countryDTO.id());
+    public Country deleteLanguage(final CountryDTO countryDTO)
+            throws ResourceNotFoundException {
+        Optional<Country> country = countryRepository
+                .findById(countryDTO.id());
         if (country.isPresent()) {
-            List<Language> languages = languageRepository.findByNames(countryDTO.languages());
+            List<Language> languages = languageRepository
+                    .findByNames(countryDTO.languages());
+            if (languages.isEmpty()) {
+                throw new BadRequestException("List of languages"
+                        + " for deleting is empty"
+                        + " or these languages don't exist.");
+            }
             for (Language language : languages) {
                 country.get().removeLanguage(language);
             }
-            Country saveCountry =  countryRepository.save(country.get());
-            countryCache.put(saveCountry.getId(), saveCountry);
-            return saveCountry;
+            country = Optional.of(countryRepository.save(country.get()));
+            countryCache.put(country.get().getId(), country.get());
+            return country.get();
         }
-        return null;
+        throw new ResourceNotFoundException("Country with id :: "
+                + countryDTO.id() + " not found.");
     }
 
     @Override
     @AspectAnnotation
-    public Country updateInfo(final CountryDTO countryDTO) {
+    public Country updateInfo(final CountryDTO countryDTO)
+            throws ResourceNotFoundException {
         Optional<Country> country = countryRepository.findById(countryDTO.id());
         if (country.isPresent()) {
             if (countryDTO.longitude() != null) {
@@ -132,16 +166,18 @@ public class CountryServiceImpl implements CountryService {
             if (countryDTO.name() != null) {
                 country.get().setName(countryDTO.name());
             }
-            Country saveCountry = countryRepository.save(country.get());
-            countryCache.put(saveCountry.getId(), saveCountry);
-            return saveCountry;
+            country = Optional.of(countryRepository.save(country.get()));
+            countryCache.put(country.get().getId(), country.get());
+            return country.get();
         }
-        return null;
+        throw new ResourceNotFoundException("Country with id :: "
+                + countryDTO.id() + " not found.");
     }
 
     @Override
-    public List<Country> findAllCountriesContainingSpecifiedLanguage(final String name) {
-        return countryRepository.findAllCountriesContainingSpecifiedLanguage(name);
+    public List<Country> findCountriesWithSpecifiedLanguage(final String name) {
+        return countryRepository
+                .findAllCountriesContainingSpecifiedLanguage(name);
     }
 
 }

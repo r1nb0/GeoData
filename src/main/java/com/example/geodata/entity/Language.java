@@ -25,7 +25,8 @@ public class Language {
     @Column(name = "language_code")
     private String code;
 
-    @ManyToMany(mappedBy = "languages", cascade = { CascadeType.MERGE, CascadeType.PERSIST },
+    @ManyToMany(mappedBy = "languages",
+            cascade = { CascadeType.MERGE, CascadeType.PERSIST },
             fetch = FetchType.LAZY)
     @JsonBackReference
     private List<Country> countries = new ArrayList<>();
