@@ -28,8 +28,7 @@ public class CountryServiceImpl implements CountryService {
     private final LanguageRepository languageRepository;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
-    private final String NOT_FOUND = "not found";
-    private final String COUNTRY_WITH_ID = "Country with id ::";
+    private static final String NO_EXIST = "Country don't exist with id =";
 
     @Override
     public List<Country> getAll() {
@@ -44,7 +43,7 @@ public class CountryServiceImpl implements CountryService {
         if (country.isEmpty()) {
             country = countryRepository.findById(id);
             if (country.isEmpty()) {
-                throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + id + " " + NOT_FOUND);
+                throw new ResourceNotFoundException(NO_EXIST + " " + id);
             }
             country.ifPresent(value -> countryCache.put(value.getId(), value));
         }
@@ -96,7 +95,7 @@ public class CountryServiceImpl implements CountryService {
             }
             countryRepository.delete(country.get());
         }
-        throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + id + " " + NOT_FOUND);
+        throw new ResourceNotFoundException(NO_EXIST + " " + id);
     }
 
     @Override
@@ -120,7 +119,7 @@ public class CountryServiceImpl implements CountryService {
                 countryCache.put(country.get().getId(), country.get());
                 return country.get();
             }
-            throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + countryDTO.id() + " " + NOT_FOUND);
+            throw new ResourceNotFoundException(NO_EXIST + " " + countryDTO.id());
     }
 
     @Override
@@ -144,7 +143,7 @@ public class CountryServiceImpl implements CountryService {
             countryCache.put(country.get().getId(), country.get());
             return country.get();
         }
-        throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + countryDTO.id() + " " + NOT_FOUND);
+        throw new ResourceNotFoundException(NO_EXIST + " " + countryDTO.id());
     }
 
     @Override
@@ -169,7 +168,7 @@ public class CountryServiceImpl implements CountryService {
             countryCache.put(country.get().getId(), country.get());
             return country.get();
         }
-        throw new ResourceNotFoundException(COUNTRY_WITH_ID + " " + countryDTO.id() + " " + NOT_FOUND);
+        throw new ResourceNotFoundException(NO_EXIST + " " + countryDTO.id());
     }
 
     @Override
