@@ -56,7 +56,8 @@ public class LanguageServiceImpl implements LanguageService {
         Optional<Language> language = languageRepository
                 .findById(languageDTO.id());
         if (language.isEmpty()) {
-            throw new ResourceNotFoundException(NO_EXIST + " " + languageDTO.id());
+            throw new ResourceNotFoundException(NO_EXIST
+                    + " " + languageDTO.id());
         }
         if (languageDTO.code() != null) {
             language.get().setCode(languageDTO.code());

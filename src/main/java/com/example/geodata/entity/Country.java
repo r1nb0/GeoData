@@ -31,12 +31,16 @@ public class Country {
     @Column(name = "longitude")
     private Double longitude;
 
-    @OneToMany(mappedBy = "country", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "country",
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<City> cities = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
-    @JoinTable(name = "countries_languages", joinColumns = {@JoinColumn(name = "country_id")},
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            fetch = FetchType.LAZY)
+    @JoinTable(name = "countries_languages",
+            joinColumns = {@JoinColumn(name = "country_id")},
             inverseJoinColumns = {@JoinColumn(name = "language_id")})
     @JsonManagedReference
     private Set<Language> languages = new HashSet<>();

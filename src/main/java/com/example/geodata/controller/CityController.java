@@ -29,7 +29,9 @@ public class CityController {
 
     @GetMapping("/info/{cityId}")
     @AspectAnnotation
-    public ResponseEntity<Optional<City>> findById(@PathVariable final Integer cityId)
+    public ResponseEntity<Optional<City>> findById(
+            @PathVariable final Integer cityId
+    )
             throws ResourceNotFoundException {
         return ResponseEntity.ok(cityService.findById(cityId));
     }
@@ -38,7 +40,8 @@ public class CityController {
     @AspectAnnotation
     public ResponseEntity<City> addCity(@RequestBody final CityDTO cityDTO)
             throws ResourceNotFoundException {
-        return new ResponseEntity<>(cityService.addCity(cityDTO), HttpStatus.OK);
+        return new ResponseEntity<>(cityService.addCity(cityDTO),
+                HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{cityId}")
@@ -51,7 +54,9 @@ public class CityController {
 
     @PutMapping("/changeCountry")
     @AspectAnnotation
-    public ResponseEntity<City> changeCountry(@RequestBody final CityDTO cityDTO)
+    public ResponseEntity<City> changeCountry(
+            @RequestBody final CityDTO cityDTO
+    )
             throws ResourceNotFoundException {
         City city = cityService.replaceCountry(cityDTO);
         return new ResponseEntity<>(city, HttpStatus.OK);

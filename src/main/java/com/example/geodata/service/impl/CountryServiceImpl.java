@@ -119,7 +119,8 @@ public class CountryServiceImpl implements CountryService {
                 countryCache.put(country.get().getId(), country.get());
                 return country.get();
             }
-            throw new ResourceNotFoundException(NO_EXIST + " " + countryDTO.id());
+            throw new ResourceNotFoundException(NO_EXIST
+                    + " " + countryDTO.id());
     }
 
     @Override

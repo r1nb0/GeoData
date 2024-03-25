@@ -29,14 +29,18 @@ public class CountryController {
 
     @GetMapping("/info/{id}")
     @AspectAnnotation
-    public ResponseEntity<Optional<Country>> findById(@PathVariable final Integer id)
+    public ResponseEntity<Optional<Country>> findById(
+            @PathVariable final Integer id
+    )
             throws ResourceNotFoundException {
         return ResponseEntity.ok(countryService.findById(id));
     }
 
     @PostMapping("/create")
     @AspectAnnotation
-    public ResponseEntity<Country> addCountry(@RequestBody final CountryDTO countryDTO) {
+    public ResponseEntity<Country> addCountry(
+            @RequestBody final CountryDTO countryDTO
+    ) {
         Country country = countryService.addCountry(countryDTO);
         if (country == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -54,7 +58,9 @@ public class CountryController {
 
     @PutMapping("/updateInfo")
     @AspectAnnotation
-    public ResponseEntity<Country> updateInfo(@RequestBody final CountryDTO countryDTO)
+    public ResponseEntity<Country> updateInfo(
+            @RequestBody final CountryDTO countryDTO
+    )
             throws ResourceNotFoundException {
         return new ResponseEntity<>(countryService.updateInfo(countryDTO),
                 HttpStatus.OK);
@@ -62,7 +68,9 @@ public class CountryController {
 
     @PutMapping("/addLanguages")
     @AspectAnnotation
-    public ResponseEntity<Country> addLanguages(@RequestBody final CountryDTO countryDTO)
+    public ResponseEntity<Country> addLanguages(
+            @RequestBody final CountryDTO countryDTO
+    )
             throws ResourceNotFoundException {
         return new ResponseEntity<>(countryService.addLanguage(countryDTO),
                 HttpStatus.OK);
@@ -70,14 +78,18 @@ public class CountryController {
 
     @PutMapping("/removeLanguages")
     @AspectAnnotation
-    public ResponseEntity<Country> deleteLanguages(@RequestBody final CountryDTO countryDTO)
+    public ResponseEntity<Country> deleteLanguages(
+            @RequestBody final CountryDTO countryDTO
+    )
             throws ResourceNotFoundException {
         return new ResponseEntity<>(countryService.deleteLanguage(countryDTO),
                 HttpStatus.OK);
     }
 
     @GetMapping("/info/countriesFromLanguage/{languageName}")
-    public List<Country> getCountriesFromLanguage(@PathVariable final String languageName) {
+    public List<Country> getCountriesFromLanguage(
+            @PathVariable final String languageName
+    ) {
         return countryService.findCountriesWithSpecifiedLanguage(languageName);
     }
 

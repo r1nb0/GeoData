@@ -37,8 +37,11 @@ public class LanguageController {
 
     @PostMapping("/create")
     @AspectAnnotation
-    ResponseEntity<Language> addLanguage(@RequestBody final LanguageDTO languageDTO) {
-        return new ResponseEntity<>(languageService.save(languageDTO), HttpStatus.OK);
+    ResponseEntity<Language> addLanguage(
+            @RequestBody final LanguageDTO languageDTO
+    ) {
+        return new ResponseEntity<>(languageService.save(languageDTO),
+                HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{idLanguage}")
@@ -51,9 +54,12 @@ public class LanguageController {
 
     @PutMapping("/updateInfo")
     @AspectAnnotation
-    ResponseEntity<Language> updateInfo(@RequestBody final LanguageDTO languageDTO)
-            throws ResourceNotFoundException{
-        return new ResponseEntity<>(languageService.update(languageDTO), HttpStatus.OK);
+    ResponseEntity<Language> updateInfo(
+            @RequestBody final LanguageDTO languageDTO
+    )
+            throws ResourceNotFoundException {
+        return new ResponseEntity<>(languageService.update(languageDTO),
+                HttpStatus.OK);
     }
 
 }
