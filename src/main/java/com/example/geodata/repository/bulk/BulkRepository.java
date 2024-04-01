@@ -5,12 +5,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 
 @Repository
-public interface BulkRepository<ID, E> {
+public interface BulkRepository<T, E> {
 
     void bulkInsert(Collection<E> entities);
 
     void bulkUpdate(Collection<E> entities);
 
-    void bulkDelete(Collection<ID> ids);
+    void bulkDelete(Collection<T> ids);
 
 }

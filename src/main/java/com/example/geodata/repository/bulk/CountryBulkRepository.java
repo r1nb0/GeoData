@@ -34,12 +34,12 @@ public class CountryBulkRepository implements BulkRepository<Integer, Country> {
 
     @Override
     public void bulkUpdate(Collection<Country> entities) {
-
+        //
     }
 
     @Override
     public void bulkDelete(Collection<Integer> integers) {
-
+        //
     }
 
 }

@@ -32,11 +32,11 @@ public class CityBulkRepository implements BulkRepository<Integer, City> {
 
     @Override
     public void bulkUpdate(final Collection<City> entities) {
-
+        //
     }
 
     @Override
     public void bulkDelete(final Collection<Integer> ids) {
-
+        //
     }
 }
