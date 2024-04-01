@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -29,7 +29,7 @@ public class Language {
             cascade = { CascadeType.MERGE, CascadeType.PERSIST },
             fetch = FetchType.LAZY)
     @JsonBackReference
-    private List<Country> countries = new ArrayList<>();
+    private Set<Country> countries = new HashSet<>();
 
     @Override
     public String toString() {

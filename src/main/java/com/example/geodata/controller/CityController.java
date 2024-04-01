@@ -40,7 +40,7 @@ public class CityController {
     @AspectAnnotation
     public ResponseEntity<City> addCity(@RequestBody final CityDTO cityDTO)
             throws ResourceNotFoundException {
-        return new ResponseEntity<>(cityService.addCity(cityDTO),
+        return new ResponseEntity<>(cityService.createCity(cityDTO),
                 HttpStatus.OK);
     }
 
@@ -68,6 +68,12 @@ public class CityController {
             throws ResourceNotFoundException {
         City city = cityService.update(cityDTO);
         return new ResponseEntity<>(city, HttpStatus.OK);
+    }
+
+    @PostMapping("/bulkInsert")
+    @AspectAnnotation
+    public void bulkInsert(@RequestBody final List<CityDTO> cityDTOS) {
+        cityService.bulkInsert(cityDTOS);
     }
 
 }
