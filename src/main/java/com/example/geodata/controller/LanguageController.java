@@ -24,29 +24,29 @@ public class LanguageController {
 
     @GetMapping("/all")
     @AspectAnnotation
-    ResponseEntity<List<Language>> getAll() {
+    public ResponseEntity<List<Language>> getAll() {
         return new ResponseEntity<>(languageService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/info/{id}")
     @AspectAnnotation
-    ResponseEntity<Optional<Language>> getById(@PathVariable final Integer id)
+    public ResponseEntity<Optional<Language>> getById(@PathVariable final Integer id)
             throws ResourceNotFoundException {
         return ResponseEntity.ok(languageService.findById(id));
     }
 
     @PostMapping("/create")
     @AspectAnnotation
-    ResponseEntity<Language> addLanguage(
+    public ResponseEntity<Language> addLanguage(
             @RequestBody final LanguageDTO languageDTO
     ) {
-        return new ResponseEntity<>(languageService.save(languageDTO),
+        return new ResponseEntity<>(languageService.createLanguage(languageDTO),
                 HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{idLanguage}")
     @AspectAnnotation
-    HttpStatus deleteLanguage(@PathVariable final Integer idLanguage)
+    public HttpStatus deleteLanguage(@PathVariable final Integer idLanguage)
             throws ResourceNotFoundException {
         languageService.deleteById(idLanguage);
         return HttpStatus.OK;
@@ -54,12 +54,19 @@ public class LanguageController {
 
     @PutMapping("/updateInfo")
     @AspectAnnotation
-    ResponseEntity<Language> updateInfo(
+    public ResponseEntity<Language> updateInfo(
             @RequestBody final LanguageDTO languageDTO
     )
             throws ResourceNotFoundException {
         return new ResponseEntity<>(languageService.update(languageDTO),
                 HttpStatus.OK);
     }
+
+    @PostMapping("/bulkInsert")
+    @AspectAnnotation
+    void bulkInsert(@RequestBody final List<LanguageDTO> languageDTOS) {
+        languageService.bulkInsert(languageDTOS);
+    }
+
 
 }

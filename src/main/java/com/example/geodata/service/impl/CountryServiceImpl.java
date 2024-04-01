@@ -11,14 +11,14 @@ import com.example.geodata.exceptions.BadRequestException;
 import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.repository.LanguageRepository;
+import com.example.geodata.repository.bulk.CountryBulkRepository;
 import com.example.geodata.service.CountryService;
+import com.example.geodata.service.utility.CountryDTOUtility;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -28,6 +28,7 @@ public class CountryServiceImpl implements CountryService {
     private final LanguageRepository languageRepository;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
+    private final CountryBulkRepository countryBulkRepository;
     private static final String NO_EXIST = "Country don't exist with id =";
 
     @Override
@@ -52,9 +53,7 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     @AspectAnnotation
-    public Country addCountry(final CountryDTO countryDTO) {
-        List<Language> languages = languageRepository
-                .findByNames(countryDTO.languages());
+    public Country createCountry(final CountryDTO countryDTO) {
         if (Boolean.TRUE.equals(countryRepository
                 .existsByName(countryDTO.name()))) {
             throw new BadRequestException("Country with name :: "
@@ -67,17 +66,8 @@ public class CountryServiceImpl implements CountryService {
                     + "[name, nationality, latitude, longitude]"
                     + "must be provided.");
         }
-        Country country = Country.builder()
-                .name(countryDTO.name())
-                .nationality(countryDTO.nationality())
-                .latitude(countryDTO.latitude())
-                .longitude(countryDTO.longitude())
-                .languages(new HashSet<>())
-                .cities(new ArrayList<>())
-                .build();
-        for (Language language : languages) {
-            country.addLanguage(language);
-        }
+        Country country = CountryDTOUtility
+                .buildCountryFromCountryDTO(countryDTO);
         country = countryRepository.save(country);
         countryCache.put(country.getId(), country);
         return country;
@@ -176,6 +166,18 @@ public class CountryServiceImpl implements CountryService {
     public List<Country> findCountriesWithSpecifiedLanguage(final String name) {
         return countryRepository
                 .findAllCountriesContainingSpecifiedLanguage(name);
+    }
+
+    @Transactional
+    @Override
+    public void bulkInsert(List<CountryDTO> countryDTOS) {
+        List<Country> countries = new ArrayList<>();
+        for (CountryDTO countryDTO : countryDTOS) {
+            Country country = CountryDTOUtility
+                    .buildCountryFromCountryDTO(countryDTO);
+            countries.add(country);
+        }
+        countryBulkRepository.bulkInsert(countries);
     }
 
 }

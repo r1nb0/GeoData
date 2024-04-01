@@ -41,7 +41,7 @@ public class CountryController {
     public ResponseEntity<Country> addCountry(
             @RequestBody final CountryDTO countryDTO
     ) {
-        Country country = countryService.addCountry(countryDTO);
+        Country country = countryService.createCountry(countryDTO);
         if (country == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -91,6 +91,12 @@ public class CountryController {
             @PathVariable final String languageName
     ) {
         return countryService.findCountriesWithSpecifiedLanguage(languageName);
+    }
+
+    @PostMapping("/bulkInsert")
+    @AspectAnnotation
+    public void bulkInsert(@RequestBody final List<CountryDTO> countryDTOS) {
+        countryService.bulkInsert(countryDTOS);
     }
 
 }

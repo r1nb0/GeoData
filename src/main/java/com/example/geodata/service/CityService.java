@@ -19,7 +19,7 @@ public interface CityService {
     Optional<City> findById(Integer id)
             throws ResourceNotFoundException;
 
-    City addCity(CityDTO cityDTO)
+    City createCity(CityDTO cityDTO)
             throws ResourceNotFoundException;
 
     City replaceCountry(CityDTO cityDTO)
@@ -27,6 +27,8 @@ public interface CityService {
 
     City update(CityDTO cityDTO)
             throws ResourceNotFoundException;
+
+    void bulkInsert(List<CityDTO> cityDTO);
 
 
 }

@@ -13,7 +13,7 @@ public interface LanguageService {
 
     List<Language> findAll();
 
-    Language save(LanguageDTO language);
+    Language createLanguage(LanguageDTO language);
 
     Language update(LanguageDTO languageDTO)
             throws ResourceNotFoundException;
@@ -23,5 +23,7 @@ public interface LanguageService {
 
     Optional<Language> findById(Integer id)
             throws ResourceNotFoundException;
+
+    void bulkInsert(List<LanguageDTO> languageDTOS);
 
 }

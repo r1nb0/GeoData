@@ -9,7 +9,10 @@ import com.example.geodata.entity.Language;
 import com.example.geodata.exceptions.BadRequestException;
 import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.LanguageRepository;
+import com.example.geodata.repository.bulk.LanguageBulkRepository;
 import com.example.geodata.service.LanguageService;
+import com.example.geodata.service.utility.LanguageDTOUtility;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,7 @@ public class LanguageServiceImpl implements LanguageService {
     private final LanguageRepository languageRepository;
     private final LRUCacheCountry countryCache;
     private final LRUCacheLanguage languageCache;
+    private final LanguageBulkRepository languageBulkRepository;
     private static final String NO_EXIST = "Language don't exist with id =";
 
     @Override
@@ -33,12 +37,9 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     @AspectAnnotation
-    public Language save(final LanguageDTO languageDTO) {
-        Language language = Language.builder()
-                .name(languageDTO.name())
-                .countries(new ArrayList<>())
-                .code(languageDTO.code())
-                .build();
+    public Language createLanguage(final LanguageDTO languageDTO) {
+        Language language = LanguageDTOUtility
+                .buildLanguageFromLanguageDTO(languageDTO);
         if (languageDTO.name() == null || languageDTO.code() == null) {
             throw new BadRequestException("All fields: "
                     + "[name, code]"
@@ -104,5 +105,17 @@ public class LanguageServiceImpl implements LanguageService {
             languageCache.put(language.get().getId(), language.get());
         }
         return language;
+    }
+
+    @Transactional
+    @Override
+    public void bulkInsert(List<LanguageDTO> languageDTOS) {
+        List<Language> languages = new ArrayList<>();
+        for (LanguageDTO languageDTO : languageDTOS) {
+            Language language = LanguageDTOUtility
+                    .buildLanguageFromLanguageDTO(languageDTO);
+            languages.add(language);
+        }
+        languageBulkRepository.bulkInsert(languages);
     }
 }

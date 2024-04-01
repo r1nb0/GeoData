@@ -16,7 +16,7 @@ public interface CountryService {
     Optional<Country> findById(Integer id)
             throws ResourceNotFoundException;
 
-    Country addCountry(CountryDTO countryDTO);
+    Country createCountry(CountryDTO countryDTO);
 
     void deleteCountryById(Integer id)
             throws ResourceNotFoundException;
@@ -31,5 +31,7 @@ public interface CountryService {
             throws ResourceNotFoundException;
 
     List<Country> findCountriesWithSpecifiedLanguage(String name);
+
+    void bulkInsert(List<CountryDTO> countryDTOS);
 
 }

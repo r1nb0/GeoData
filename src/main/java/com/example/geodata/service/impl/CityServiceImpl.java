@@ -10,10 +10,14 @@ import com.example.geodata.exceptions.BadRequestException;
 import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.CountryRepository;
+import com.example.geodata.repository.bulk.CityBulkRepository;
 import com.example.geodata.service.CityService;
+import com.example.geodata.service.utility.CityDTOUtility;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +27,7 @@ import java.util.Optional;
 public class CityServiceImpl implements CityService {
 
     private final CityRepository cityRepository;
+    private final CityBulkRepository cityBulkRepository;
     private final CountryRepository countryRepository;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
@@ -41,7 +46,7 @@ public class CityServiceImpl implements CityService {
         if (city.isPresent()) {
             cityCache.remove(id);
             countryCache.remove(city.get().getCountry().getId());
-            cityRepository.delete(city.get());
+            cityRepository.deleteById(id);
         } else {
             throw new ResourceNotFoundException(NO_EXIST + " " + id);
         }
@@ -57,14 +62,14 @@ public class CityServiceImpl implements CityService {
             if (city.isEmpty()) {
                 throw new ResourceNotFoundException(NO_EXIST + " " + id);
             }
-            cityCache.put(city.get().getId(), city.get());
+            cityCache.put(id, city.get());
         }
         return city;
     }
 
     @Override
     @AspectAnnotation
-    public City addCity(final CityDTO cityDTO)
+    public City createCity(final CityDTO cityDTO)
             throws ResourceNotFoundException {
         Optional<Country> country = countryRepository
                 .findCountryByName(cityDTO.countryName());
@@ -75,13 +80,8 @@ public class CityServiceImpl implements CityService {
                         + "[name, latitude, longitude]"
                         + "must be provided.");
             }
-            City city = City.builder()
-                    .name(cityDTO.name())
-                    .latitude(cityDTO.latitude())
-                    .longitude(cityDTO.longitude())
-                    .country(country.get())
-                    .build();
-            city = cityRepository.save(city);
+            City city = CityDTOUtility.buildCityFromDTO(cityDTO, country.get());
+            cityRepository.save(city);
             cityCache.put(city.getId(), city);
             countryCache.remove(city.getCountry().getId());
             return city;
@@ -101,7 +101,7 @@ public class CityServiceImpl implements CityService {
                     .findCountryByName(cityDTO.countryName());
             if (country.isPresent()) {
                 city.get().setCountry(country.get());
-                city = Optional.of(cityRepository.save(city.get()));
+                cityRepository.save(city.get());
                 cityCache.put(city.get().getId(), city.get());
                 countryCache.remove(city.get().getCountry().getId());
                 return city.get();
@@ -128,13 +128,29 @@ public class CityServiceImpl implements CityService {
             if (cityDTO.name() != null) {
                 city.get().setName(cityDTO.name());
             }
-            city = Optional.of(cityRepository.save(city.get()));
             countryCache.remove(city.get().getCountry().getId());
             cityCache.put(city.get().getId(), city.get());
+            cityRepository.save(city.get());
             return city.get();
         } else {
             throw new ResourceNotFoundException(NO_EXIST + " " + cityDTO.id());
         }
     }
+
+    @Transactional
+    @Override
+    public void bulkInsert(final List<CityDTO> cityDTOS) {
+            List<City> cities = new ArrayList<>();
+            for (CityDTO cityDTO: cityDTOS) {
+                Optional<Country> country = countryRepository
+                        .findCountryByName(cityDTO.countryName());
+                if (country.isPresent()) {
+                    City city = CityDTOUtility
+                            .buildCityFromDTO(cityDTO, country.get());
+                    cities.add(city);
+                }
+            }
+            cityBulkRepository.bulkInsert(cities);
+        }
 
 }
