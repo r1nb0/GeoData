@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.util.Collection;
 
 @Repository
-public class CityBulkRepository implements BulkRepository<Integer, City> {
+public class CityBulkRepository implements BulkRepository<City> {
 
     private final JdbcTemplate jdbcTemplate;
 
