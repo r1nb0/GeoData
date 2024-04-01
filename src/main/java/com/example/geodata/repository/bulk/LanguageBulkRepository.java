@@ -28,14 +28,4 @@ public class LanguageBulkRepository implements BulkRepository<Integer, Language>
                 });
     }
 
-    @Override
-    public void bulkUpdate(Collection<Language> languages) {
-
-    }
-
-    @Override
-    public void bulkDelete(Collection<Integer> ids) {
-
-    }
-
 }
