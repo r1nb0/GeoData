@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.util.Collection;
 
 @Repository
-public class LanguageBulkRepository implements BulkRepository<Integer, Language> {
+public class LanguageBulkRepository implements BulkRepository<Language> {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -26,16 +26,6 @@ public class LanguageBulkRepository implements BulkRepository<Integer, Language>
                     ps.setString(1, language.getName());
                     ps.setString(2, language.getCode());
                 });
-    }
-
-    @Override
-    public void bulkUpdate(Collection<Language> languages) {
-
-    }
-
-    @Override
-    public void bulkDelete(Collection<Integer> ids) {
-
     }
 
 }
