@@ -10,7 +10,7 @@ import java.sql.PreparedStatement;
 import java.util.Collection;
 
 @Repository
-public class CountryBulkRepository implements BulkRepository<Integer, Country> {
+public class CountryBulkRepository implements BulkRepository<Country> {
 
     private final JdbcTemplate jdbcTemplate;
 
