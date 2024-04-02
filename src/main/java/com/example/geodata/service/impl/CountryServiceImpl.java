@@ -11,15 +11,21 @@ import com.example.geodata.exceptions.BadRequestException;
 import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.CountryRepository;
 import com.example.geodata.repository.LanguageRepository;
-import com.example.geodata.repository.bulk.CountryBulkRepository;
 import com.example.geodata.service.CountryService;
 import com.example.geodata.service.utility.CountryDTOUtility;
+import io.micrometer.common.lang.NonNullApi;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
+@NonNullApi
 @Service
 @AllArgsConstructor
 public class CountryServiceImpl implements CountryService {
@@ -27,9 +33,10 @@ public class CountryServiceImpl implements CountryService {
     private final CountryRepository countryRepository;
     private final LanguageRepository languageRepository;
     private final LRUCacheCity cityCache;
+    private final JdbcTemplate jdbcTemplate;
     private final LRUCacheCountry countryCache;
-    private final CountryBulkRepository countryBulkRepository;
     private static final String NO_EXIST = "Country don't exist with id =";
+    private static final String ALREADY_EXIST = "Country already exist with name =";
 
     @Override
     public List<Country> getAll() {
@@ -46,7 +53,7 @@ public class CountryServiceImpl implements CountryService {
             if (country.isEmpty()) {
                 throw new ResourceNotFoundException(NO_EXIST + " " + id);
             }
-            country.ifPresent(value -> countryCache.put(value.getId(), value));
+            countryCache.put(id, country.get());
         }
         return country;
     }
@@ -56,8 +63,7 @@ public class CountryServiceImpl implements CountryService {
     public Country createCountry(final CountryDTO countryDTO) {
         if (Boolean.TRUE.equals(countryRepository
                 .existsByName(countryDTO.name()))) {
-            throw new BadRequestException("Country with name :: "
-                    + countryDTO.name() + " is already exist.");
+            throw new BadRequestException(ALREADY_EXIST + " " + countryDTO.name());
         }
         if (countryDTO.name() == null || countryDTO.longitude() == null
                 || countryDTO.latitude() == null
@@ -68,14 +74,14 @@ public class CountryServiceImpl implements CountryService {
         }
         Country country = CountryDTOUtility
                 .buildCountryFromCountryDTO(countryDTO);
-        country = countryRepository.save(country);
+        countryRepository.save(country);
         countryCache.put(country.getId(), country);
         return country;
     }
 
     @Override
     @AspectAnnotation
-    public void deleteCountryById(final Integer id)
+    public void deleteById(final Integer id)
             throws ResourceNotFoundException {
         Optional<Country> country = countryRepository.findById(id);
         if (country.isPresent()) {
@@ -83,9 +89,10 @@ public class CountryServiceImpl implements CountryService {
             for (City city : country.get().getCities()) {
                 cityCache.remove(city.getId());
             }
-            countryRepository.delete(country.get());
+            countryRepository.deleteById(id);
+        } else {
+            throw new ResourceNotFoundException(NO_EXIST + " " + id);
         }
-        throw new ResourceNotFoundException(NO_EXIST + " " + id);
     }
 
     @Override
@@ -105,7 +112,7 @@ public class CountryServiceImpl implements CountryService {
                 for (Language language : languageExist) {
                     country.get().addLanguage(language);
                 }
-                country = Optional.of(countryRepository.save(country.get()));
+                countryRepository.save(country.get());
                 countryCache.put(country.get().getId(), country.get());
                 return country.get();
             }
@@ -130,7 +137,7 @@ public class CountryServiceImpl implements CountryService {
             for (Language language : languages) {
                 country.get().removeLanguage(language);
             }
-            country = Optional.of(countryRepository.save(country.get()));
+            countryRepository.save(country.get());
             countryCache.put(country.get().getId(), country.get());
             return country.get();
         }
@@ -142,6 +149,10 @@ public class CountryServiceImpl implements CountryService {
     public Country updateInfo(final CountryDTO countryDTO)
             throws ResourceNotFoundException {
         Optional<Country> country = countryRepository.findById(countryDTO.id());
+        if (Boolean.TRUE.equals(countryRepository
+                .existsByName(countryDTO.name()))) {
+            throw new BadRequestException(ALREADY_EXIST + " " + countryDTO.name());
+        }
         if (country.isPresent()) {
             if (countryDTO.longitude() != null) {
                 country.get().setLongitude(countryDTO.longitude());
@@ -155,7 +166,7 @@ public class CountryServiceImpl implements CountryService {
             if (countryDTO.name() != null) {
                 country.get().setName(countryDTO.name());
             }
-            country = Optional.of(countryRepository.save(country.get()));
+            countryRepository.save(country.get());
             countryCache.put(country.get().getId(), country.get());
             return country.get();
         }
@@ -171,13 +182,32 @@ public class CountryServiceImpl implements CountryService {
     @Transactional
     @Override
     public void bulkInsert(List<CountryDTO> countryDTOS) {
-        List<Country> countries = new ArrayList<>();
-        for (CountryDTO countryDTO : countryDTOS) {
-            Country country = CountryDTOUtility
-                    .buildCountryFromCountryDTO(countryDTO);
-            countries.add(country);
-        }
-        countryBulkRepository.bulkInsert(countries);
+        List<Country> countries = countryDTOS.stream()
+                .map(CountryDTOUtility::buildCountryFromCountryDTO)
+                .toList();
+
+        jdbcTemplate.batchUpdate("INSERT into countries"
+                        + " (country_name, nationality, latitude, longitude)"
+                        + " VALUES (?, ?, ?, ?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i)
+                            throws SQLException {
+                        ps.setString(1, countries
+                                .get(i).getName());
+                        ps.setString(2, countries
+                                .get(i).getNationality());
+                        ps.setDouble(3, countries
+                                .get(i).getLatitude());
+                        ps.setDouble(4, countries
+                                .get(i).getLongitude());
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return countries.size();
+                    }
+                });
     }
 
 }

@@ -9,17 +9,21 @@ import com.example.geodata.entity.Language;
 import com.example.geodata.exceptions.BadRequestException;
 import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.LanguageRepository;
-import com.example.geodata.repository.bulk.LanguageBulkRepository;
 import com.example.geodata.service.LanguageService;
 import com.example.geodata.service.utility.LanguageDTOUtility;
+import io.micrometer.common.lang.NonNullApi;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+@NonNullApi
 @Service
 @AllArgsConstructor
 public class LanguageServiceImpl implements LanguageService {
@@ -27,7 +31,7 @@ public class LanguageServiceImpl implements LanguageService {
     private final LanguageRepository languageRepository;
     private final LRUCacheCountry countryCache;
     private final LRUCacheLanguage languageCache;
-    private final LanguageBulkRepository languageBulkRepository;
+    private final JdbcTemplate jdbcTemplate;
     private static final String NO_EXIST = "Language don't exist with id =";
 
     @Override
@@ -45,7 +49,7 @@ public class LanguageServiceImpl implements LanguageService {
                     + "[name, code]"
                     + "must be provided.");
         }
-        language = languageRepository.save(language);
+        languageRepository.save(language);
         languageCache.put(language.getId(), language);
         return language;
     }
@@ -66,7 +70,7 @@ public class LanguageServiceImpl implements LanguageService {
         if (languageDTO.name() != null) {
             language.get().setName(languageDTO.name());
         }
-        language = Optional.of(languageRepository.save(language.get()));
+        languageRepository.save(language.get());
         for (Country country : language.get().getCountries()) {
             countryCache.remove(country.getId());
         }
@@ -102,7 +106,7 @@ public class LanguageServiceImpl implements LanguageService {
             if (language.isEmpty()) {
                 throw new ResourceNotFoundException(NO_EXIST + " " + id);
             }
-            languageCache.put(language.get().getId(), language.get());
+            languageCache.put(id, language.get());
         }
         return language;
     }
@@ -110,12 +114,26 @@ public class LanguageServiceImpl implements LanguageService {
     @Transactional
     @Override
     public void bulkInsert(List<LanguageDTO> languageDTOS) {
-        List<Language> languages = new ArrayList<>();
-        for (LanguageDTO languageDTO : languageDTOS) {
-            Language language = LanguageDTOUtility
-                    .buildLanguageFromLanguageDTO(languageDTO);
-            languages.add(language);
-        }
-        languageBulkRepository.bulkInsert(languages);
+        List<Language> languages = languageDTOS.stream()
+                .map(LanguageDTOUtility::buildLanguageFromLanguageDTO)
+                .toList();
+        jdbcTemplate.batchUpdate("INSERT into languages"
+                        + " (language_name, language_code)"
+                        + " VALUES (?, ?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement preparedStatement, int i)
+                            throws SQLException {
+                        preparedStatement.setString(1, languages
+                                .get(i).getName());
+                        preparedStatement.setString(2, languages
+                                .get(i).getCode());
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return languages.size();
+                    }
+                });
     }
 }

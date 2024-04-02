@@ -18,7 +18,7 @@ public interface CountryService {
 
     Country createCountry(CountryDTO countryDTO);
 
-    void deleteCountryById(Integer id)
+    void deleteById(Integer id)
             throws ResourceNotFoundException;
 
     Country deleteLanguage(CountryDTO countryDTO)

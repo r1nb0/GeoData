@@ -10,25 +10,28 @@ import com.example.geodata.exceptions.BadRequestException;
 import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.CityRepository;
 import com.example.geodata.repository.CountryRepository;
-import com.example.geodata.repository.bulk.CityBulkRepository;
 import com.example.geodata.service.CityService;
 import com.example.geodata.service.utility.CityDTOUtility;
+import io.micrometer.common.lang.NonNullApi;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-
+@NonNullApi
 @Service
 @AllArgsConstructor
 public class CityServiceImpl implements CityService {
 
     private final CityRepository cityRepository;
-    private final CityBulkRepository cityBulkRepository;
     private final CountryRepository countryRepository;
+    private final JdbcTemplate jdbcTemplate;
     private final LRUCacheCity cityCache;
     private final LRUCacheCountry countryCache;
     private static final String NO_EXIST = "City don't exist with id =";
@@ -139,18 +142,35 @@ public class CityServiceImpl implements CityService {
 
     @Transactional
     @Override
-    public void bulkInsert(final List<CityDTO> cityDTOS) {
-            List<City> cities = new ArrayList<>();
-            for (CityDTO cityDTO: cityDTOS) {
-                Optional<Country> country = countryRepository
-                        .findCountryByName(cityDTO.countryName());
-                if (country.isPresent()) {
-                    City city = CityDTOUtility
-                            .buildCityFromDTO(cityDTO, country.get());
-                    cities.add(city);
-                }
+    public void bulkInsert(List<CityDTO> cityDTOS) {
+        List<City> cities = cityDTOS.stream()
+                .map(cityDTO -> {
+                    Optional<Country> country = countryRepository
+                            .findCountryByName(cityDTO.countryName());
+                    return country.map(countryObj -> CityDTOUtility.
+                            buildCityFromDTO(cityDTO, countryObj));
+                })
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        jdbcTemplate.batchUpdate("INSERT into cities"
+                + " (city_name, fk_cities_countries, latitude, longitude)"
+                + " VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int i)
+                    throws SQLException {
+                preparedStatement.setString(1, cities.get(i).getName());
+                preparedStatement.setInt(2, cities.get(i).getCountry().getId());
+                preparedStatement.setDouble(3, cities.get(i).getLatitude());
+                preparedStatement.setDouble(4, cities.get(i).getLongitude());
             }
-            cityBulkRepository.bulkInsert(cities);
-        }
+
+            @Override
+            public int getBatchSize() {
+                return cities.size();
+            }
+        });
+    }
 
 }

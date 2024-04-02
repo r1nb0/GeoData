@@ -34,7 +34,7 @@ class CityServiceImplTest {
     private LRUCacheCity cityCache;
 
     @Mock
-    private LRUCacheCountry countryCache;
+    private LRUCacheCountry cacheCountry;
 
     @InjectMocks
     private CityServiceImpl cityService;
@@ -101,6 +101,7 @@ class CityServiceImplTest {
     @Test
     void findCityById_invalidId() {
         int id = 1;
+
         when(cityCache.get(id)).thenReturn(Optional.empty());
         when(cityRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -113,6 +114,7 @@ class CityServiceImplTest {
         CityDTO cityDTO = CityDTO.builder()
                 .countryName("Belarus")
                 .build();
+
         when(countryRepository.findCountryByName(cityDTO.countryName()))
                 .thenReturn(Optional.empty());
 
@@ -126,6 +128,7 @@ class CityServiceImplTest {
                 .countryName("Belarus")
                 .build();
         Optional<Country> country = Optional.of(new Country());
+
         when(countryRepository.findCountryByName(cityDTO.countryName()))
                 .thenReturn(country);
 
@@ -146,8 +149,10 @@ class CityServiceImplTest {
                 .id(1)
                 .name("Japan")
                 .build());
+
         when(countryRepository.findCountryByName(cityDTO.countryName()))
                 .thenReturn(country);
+
         City createdCity = cityService.createCity(cityDTO);
 
         assertEquals(createdCity.getName(), cityDTO.name());
@@ -171,6 +176,7 @@ class CityServiceImplTest {
                 .id(1)
                 .build();
         Optional<City> city = Optional.of(new City());
+
         when(cityRepository.findById(cityDTO.id()))
                 .thenReturn(city);
         when(countryRepository.findCountryByName(cityDTO.countryName()))
@@ -191,6 +197,7 @@ class CityServiceImplTest {
                 .id(2)
                 .name("Belarus")
                 .build());
+
         when(cityRepository.findById(cityDTO.id()))
                 .thenReturn(city);
         when(countryRepository.findCountryByName(cityDTO.countryName()))
@@ -212,18 +219,20 @@ class CityServiceImplTest {
                 .latitude(22.4234)
                 .longitude(12.5612)
                 .build();
-        Optional<City> expectCity = Optional.of(City.builder()
+        Optional<City> expectedCity = Optional.of(City.builder()
                 .country(Country.builder()
                         .id(2)
                         .build())
                 .build());
-        when(cityRepository.findById(cityDTO.id())).thenReturn(expectCity);
+
+        when(cityRepository.findById(cityDTO.id())).thenReturn(expectedCity);
 
         City updatedCity = cityService.update(cityDTO);
 
         assertEquals(updatedCity.getName(), cityDTO.name());
         assertEquals(updatedCity.getLatitude(), cityDTO.latitude());
         assertEquals(updatedCity.getLongitude(), cityDTO.longitude());
+        verify(cacheCountry, times(1)).remove(anyInt());
     }
 
     @Test
@@ -231,6 +240,7 @@ class CityServiceImplTest {
         CityDTO cityDTO = CityDTO.builder()
                 .id(1)
                 .build();
+
         when(cityRepository.findById(cityDTO.id())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> cityService.update(cityDTO));
@@ -238,5 +248,6 @@ class CityServiceImplTest {
 
     @Test
     void bulkInsert() {
+
     }
 }

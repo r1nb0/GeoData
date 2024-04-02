@@ -28,7 +28,6 @@ public interface CityService {
     City update(CityDTO cityDTO)
             throws ResourceNotFoundException;
 
-    void bulkInsert(List<CityDTO> cityDTO);
-
+    void bulkInsert(List<CityDTO> cityDTOS);
 
 }

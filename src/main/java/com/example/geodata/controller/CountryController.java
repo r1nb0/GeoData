@@ -52,7 +52,7 @@ public class CountryController {
     @AspectAnnotation
     public HttpStatus deleteCountryById(@PathVariable final Integer id)
             throws ResourceNotFoundException {
-        countryService.deleteCountryById(id);
+        countryService.deleteById(id);
         return HttpStatus.OK;
     }
 
