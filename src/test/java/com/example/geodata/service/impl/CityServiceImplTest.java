@@ -41,7 +41,7 @@ class CityServiceImplTest {
 
     @Test
     void getAll() {
-
+        //
     }
 
     @Test
@@ -248,6 +248,6 @@ class CityServiceImplTest {
 
     @Test
     void bulkInsert() {
-
+        //
     }
 }
