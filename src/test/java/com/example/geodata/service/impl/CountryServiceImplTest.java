@@ -3,23 +3,32 @@ package com.example.geodata.service.impl;
 import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
+import com.example.geodata.entity.Language;
 import com.example.geodata.exceptions.BadRequestException;
 import com.example.geodata.exceptions.ResourceNotFoundException;
 import com.example.geodata.repository.CountryRepository;
+import com.example.geodata.repository.LanguageRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CountryServiceImplTest {
+
+    @Mock
+    private JdbcTemplate jdbcTemplate;
+
+    @Mock
+    private LanguageRepository languageRepository;
 
     @Mock
     private CountryRepository countryRepository;
@@ -31,8 +40,15 @@ class CountryServiceImplTest {
     private CountryServiceImpl countryService;
 
     @Test
-    void getAll() {
-        //
+    void getAllCountries() {
+        List<Country> expectedCountries = new ArrayList<>();
+
+        when(countryRepository.findAll())
+                .thenReturn(expectedCountries);
+
+        List<Country> actualCountries = countryService.getAll();
+
+        assertEquals(expectedCountries, actualCountries);
     }
 
     @Test
@@ -149,8 +165,118 @@ class CountryServiceImplTest {
     }
 
     @Test
-    void addLanguage() {
-        //
+    void deleteLanguage_invalidId() {
+        CountryDTO countryDTO = CountryDTO.builder()
+                .id(1)
+                .build();
+
+        when(countryRepository.findById(countryDTO.id()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> countryService.deleteLanguage(countryDTO));
+    }
+
+    @Test
+    void deleteLanguage_illegalArguments() {
+        CountryDTO countryDTO = CountryDTO.builder()
+                .id(1)
+                .build();
+        Optional<Country> expectedCountry = Optional.of(new Country());
+
+        when(countryRepository.findById(countryDTO.id()))
+                .thenReturn(expectedCountry);
+
+        when(languageRepository.findByNames(countryDTO.languages()))
+                .thenReturn(new ArrayList<>());
+
+        assertThrows(BadRequestException.class,
+                () -> countryService.deleteLanguage(countryDTO));
+    }
+
+    @Test
+    void deleteLanguage_success()
+            throws ResourceNotFoundException {
+        CountryDTO countryDTO = CountryDTO.builder()
+                .id(1)
+                .build();
+        Language testLanguage = Language.builder()
+                .id(1)
+                .name("Japanese")
+                .code("JPN")
+                .build();
+        List<Language> expectedLanguages = new ArrayList<>();
+        expectedLanguages.add(testLanguage);
+        Set<Language> countryLanguages = new HashSet<>();
+        countryLanguages.add(testLanguage);
+        Optional<Country> expectedCountry = Optional.of(new Country());
+        expectedCountry.get().setLanguages(countryLanguages);
+
+        when(countryRepository.findById(countryDTO.id()))
+                .thenReturn(expectedCountry);
+        when(languageRepository.findByNames(countryDTO.languages()))
+                .thenReturn(expectedLanguages);
+
+        Country actualCountry = countryService
+                .deleteLanguage(countryDTO);
+
+        assertTrue(actualCountry.getLanguages().isEmpty());
+    }
+
+    @Test
+    void addLanguage_invalidId() {
+        CountryDTO countryDTO = CountryDTO.builder()
+                .id(1)
+                .build();
+
+        when(countryRepository.findById(countryDTO.id()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> countryService.addLanguage(countryDTO));
+    }
+
+    @Test
+    void addLanguage_illegalArguments() {
+        CountryDTO countryDTO = CountryDTO.builder()
+                .id(1)
+                .build();
+        Optional<Country> expectedCountry = Optional.of(new Country());
+
+        when(countryRepository.findById(countryDTO.id()))
+                .thenReturn(expectedCountry);
+        when(languageRepository.findByNames(countryDTO.languages()))
+                .thenReturn(new ArrayList<>());
+
+        assertThrows(BadRequestException.class,
+                () -> countryService.addLanguage(countryDTO));
+    }
+
+    @Test
+    void addLanguage_success()
+            throws ResourceNotFoundException {
+        CountryDTO countryDTO = CountryDTO.builder()
+                .id(1)
+                .build();
+        Optional<Country> expectedCountry = Optional.of(new Country());
+        Language language = Language.builder()
+                .id(1)
+                .name("Russian")
+                .code("RUS")
+                .build();
+        List<Language> languages = new ArrayList<>();
+        languages.add(language);
+
+        when(countryRepository.findById(countryDTO.id()))
+                .thenReturn(expectedCountry);
+        when(languageRepository.findByNames(countryDTO.languages()))
+                .thenReturn(languages);
+
+        Country actualCountry = countryService
+                .addLanguage(countryDTO);
+
+        assertFalse(actualCountry.getLanguages().isEmpty());
+
     }
 
     @Test
@@ -223,6 +349,27 @@ class CountryServiceImplTest {
 
     @Test
     void bulkInsert() {
+        CountryDTO firstCountry = CountryDTO.builder()
+                .name("Belarus")
+                .nationality("Belarusian")
+                .latitude(12.2420)
+                .longitude(23.2412)
+                .build();
+        CountryDTO secondCountry = CountryDTO.builder()
+                .name("Russia")
+                .nationality("Russian")
+                .latitude(15.3400)
+                .longitude(17.2345)
+                .build();
+        List<CountryDTO> countryDTOS = Arrays
+                .asList(firstCountry, secondCountry);
 
+        countryService.bulkInsert(countryDTOS);
+
+        verify(jdbcTemplate, times(1))
+                .batchUpdate(eq("INSERT into countries"
+                        + " (country_name, nationality, latitude, longitude)"
+                        + " VALUES (?, ?, ?, ?)"),
+                        any(BatchPreparedStatementSetter.class));
     }
 }

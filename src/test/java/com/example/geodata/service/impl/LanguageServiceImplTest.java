@@ -11,7 +11,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,17 +27,27 @@ import static org.mockito.Mockito.*;
 class LanguageServiceImplTest {
 
     @Mock
-    LanguageRepository languageRepository;
+    private JdbcTemplate jdbcTemplate;
 
     @Mock
-    LRUCacheLanguage languageCache;
+    private LanguageRepository languageRepository;
+
+    @Mock
+    private LRUCacheLanguage languageCache;
 
     @InjectMocks
-    LanguageServiceImpl languageService;
+    private LanguageServiceImpl languageService;
 
     @Test
-    void findAll() {
+    void findAllLanguages() {
+        List<Language> expectedLanguages = new ArrayList<>();
 
+        when(languageRepository.findAll())
+                .thenReturn(expectedLanguages);
+
+        List<Language> actualLanguages = languageService.findAll();
+
+        assertEquals(expectedLanguages, actualLanguages);
     }
 
     @Test
@@ -170,6 +185,22 @@ class LanguageServiceImplTest {
 
     @Test
     void bulkInsert() {
+        LanguageDTO firstLanguage = LanguageDTO.builder()
+                .name("Russian")
+                .code("RUS")
+                .build();
+        LanguageDTO secondLanguage = LanguageDTO.builder()
+                .name("English")
+                .code("ENG")
+                .build();
+        List<LanguageDTO> languageDTOS = Arrays
+                .asList(firstLanguage, secondLanguage);
 
+        languageService.bulkInsert(languageDTOS);
+
+        verify(jdbcTemplate, times(1))
+                .batchUpdate(eq("INSERT into languages"
+                        + " (language_name, language_code)"
+                        + " VALUES (?, ?)"), any(BatchPreparedStatementSetter.class));
     }
 }

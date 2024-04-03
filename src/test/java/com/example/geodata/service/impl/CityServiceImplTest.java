@@ -14,7 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +28,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CityServiceImplTest {
+
+    @Mock
+    private JdbcTemplate jdbcTemplate;
 
     @Mock
     private CityRepository cityRepository;
@@ -40,8 +48,15 @@ class CityServiceImplTest {
     private CityServiceImpl cityService;
 
     @Test
-    void getAll() {
-        //
+    void getAllCities() {
+        List<City> expectedCities = new ArrayList<>();
+
+        when(cityRepository.findAll())
+                .thenReturn(expectedCities);
+
+        List<City> actualCities = cityService.getAll();
+
+        assertEquals(expectedCities, actualCities);
     }
 
     @Test
@@ -248,6 +263,33 @@ class CityServiceImplTest {
 
     @Test
     void bulkInsert() {
-        //
+        CityDTO firstCity = CityDTO.builder()
+                .name("Minsk")
+                .longitude(22.2521)
+                .latitude(32.4544)
+                .countryName("Belarus")
+                .build();
+        CityDTO secondCity = CityDTO.builder()
+                .name("Pinsk")
+                .longitude(17.3630)
+                .latitude(44.2135)
+                .countryName("Belarus")
+                .build();
+
+        List<CityDTO> cityDTOS = Arrays
+                .asList(firstCity, secondCity);
+
+        Optional<Country> expectedCountry = Optional.of(new Country());
+
+        when(countryRepository.findCountryByName(anyString()))
+                .thenReturn(expectedCountry);
+
+        cityService.bulkInsert(cityDTOS);
+
+        verify(jdbcTemplate, times(1))
+                .batchUpdate(eq("INSERT into cities"
+                        + " (city_name, fk_cities_countries, latitude, longitude)"
+                        + " VALUES (?, ?, ?, ?)"), any(BatchPreparedStatementSetter.class));
+
     }
 }
