@@ -11,14 +11,14 @@ plugins {
 jacocoTestReport {
 	reports {
 		xml.required = true
+		html.required = true
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtmlTest')
 	}
 }
 
 sonar {
 	properties {
-		property("sonar.token", "54be141c1c1a25a620324ad2f271c11a9139c8fd")
-		property("sonar.projectKey", "r1nb0_GeoData")
-		property("sonar.organization", "r1nb0")
+
 	}
 }
 
