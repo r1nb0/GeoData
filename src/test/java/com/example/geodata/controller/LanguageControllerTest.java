@@ -83,6 +83,6 @@ class LanguageControllerTest {
         HttpStatus httpStatus = languageController
                 .bulkInsert(new ArrayList<>());
 
-        assertEquals(httpStatus, HttpStatus.OK);
+        assertEquals(HttpStatus.OK, httpStatus);
     }
 }
