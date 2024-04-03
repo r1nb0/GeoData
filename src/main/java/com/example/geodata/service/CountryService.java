@@ -30,7 +30,7 @@ public interface CountryService {
     Country updateInfo(CountryDTO countryDTO)
             throws ResourceNotFoundException;
 
-    List<Country> findCountriesWithSpecifiedLanguage(String name);
+    List<Country> findCountriesWithSpecifiedLanguage(String name) throws ResourceNotFoundException;
 
     void bulkInsert(List<CountryDTO> countryDTOS);
 

@@ -63,7 +63,8 @@ public class CountryServiceImpl implements CountryService {
     public Country createCountry(final CountryDTO countryDTO) {
         if (Boolean.TRUE.equals(countryRepository
                 .existsByName(countryDTO.name()))) {
-            throw new BadRequestException(ALREADY_EXIST + " " + countryDTO.name());
+            throw new BadRequestException(ALREADY_EXIST
+                    + " " + countryDTO.name());
         }
         if (countryDTO.name() == null || countryDTO.longitude() == null
                 || countryDTO.latitude() == null
@@ -151,7 +152,8 @@ public class CountryServiceImpl implements CountryService {
         Optional<Country> country = countryRepository.findById(countryDTO.id());
         if (Boolean.TRUE.equals(countryRepository
                 .existsByName(countryDTO.name()))) {
-            throw new BadRequestException(ALREADY_EXIST + " " + countryDTO.name());
+            throw new BadRequestException(ALREADY_EXIST
+                    + " " + countryDTO.name());
         }
         if (country.isPresent()) {
             if (countryDTO.longitude() != null) {
@@ -174,7 +176,13 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public List<Country> findCountriesWithSpecifiedLanguage(final String name) {
+    public List<Country> findCountriesWithSpecifiedLanguage(final String name)
+            throws ResourceNotFoundException {
+        if (Boolean.FALSE.equals(languageRepository
+                .existsByName(name))) {
+            throw new ResourceNotFoundException("Language don't"
+                    + " exist with name = " + name);
+        }
         return countryRepository
                 .findAllCountriesContainingSpecifiedLanguage(name);
     }

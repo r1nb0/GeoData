@@ -362,4 +362,34 @@ class CountryServiceImplTest {
                         + " VALUES (?, ?, ?, ?)"),
                         any(BatchPreparedStatementSetter.class));
     }
+
+    @Test
+    void findCountriesWithSpecLanguage_invalidNameLanguage() {
+        String expectedLanguage = "Russian";
+        when(languageRepository.existsByName(expectedLanguage))
+                .thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> countryService
+                        .findCountriesWithSpecifiedLanguage(expectedLanguage));
+    }
+
+    @Test
+    void findCountriesWithSpecLanguage_success()
+            throws ResourceNotFoundException {
+        String name = "Russian";
+        List<Country> expectedCountries = new ArrayList<>();
+
+        when(languageRepository.existsByName(name))
+                .thenReturn(true);
+        when(countryRepository
+                .findAllCountriesContainingSpecifiedLanguage(name))
+                .thenReturn(expectedCountries);
+
+        List<Country> actualCountries = countryService
+                .findCountriesWithSpecifiedLanguage(name);
+
+        assertEquals(expectedCountries, actualCountries);
+    }
+
 }

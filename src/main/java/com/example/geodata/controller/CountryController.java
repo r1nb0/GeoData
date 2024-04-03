@@ -86,8 +86,9 @@ public class CountryController {
     @GetMapping("/info/countriesFromLanguage/{languageName}")
     public List<Country> getCountriesFromLanguage(
             @PathVariable final String languageName
-    ) {
-        return countryService.findCountriesWithSpecifiedLanguage(languageName);
+    ) throws ResourceNotFoundException {
+        return countryService
+                .findCountriesWithSpecifiedLanguage(languageName);
     }
 
     @PostMapping("/bulkInsert")
