@@ -92,8 +92,9 @@ public class CountryController {
 
     @PostMapping("/bulkInsert")
     @AspectAnnotation
-    public void bulkInsert(@RequestBody final List<CountryDTO> countryDTOS) {
+    public HttpStatus bulkInsert(@RequestBody final List<CountryDTO> countryDTOS) {
         countryService.bulkInsert(countryDTOS);
+        return HttpStatus.OK;
     }
 
 }

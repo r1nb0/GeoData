@@ -72,8 +72,9 @@ public class CityController {
 
     @PostMapping("/bulkInsert")
     @AspectAnnotation
-    public void bulkInsert(@RequestBody final List<CityDTO> cityDTOS) {
+    public HttpStatus bulkInsert(@RequestBody final List<CityDTO> cityDTOS) {
         cityService.bulkInsert(cityDTOS);
+        return HttpStatus.OK;
     }
 
 }
