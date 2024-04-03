@@ -106,7 +106,7 @@ class CountryControllerTest {
         HttpStatus httpStatus = countryController
                 .bulkInsert(new ArrayList<>());
 
-        assertEquals(httpStatus, HttpStatus.OK);
+        assertEquals(HttpStatus.OK, httpStatus);
     }
 
 }
