@@ -22,4 +22,6 @@ public interface LanguageRepository extends JpaRepository<Language, Integer> {
             @Param("languageId") Integer languageId
     );
 
+    Boolean existsByName(String name);
+
 }
