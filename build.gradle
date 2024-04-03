@@ -12,13 +12,13 @@ jacocoTestReport {
 	reports {
 		xml.required = true
 		html.required = true
-		html.outputLocation = layout.buildDirectory.dir('jacocoHtmlTest')
 	}
 }
 
 sonar {
 	properties {
-
+		property("sonar.login", "admin")
+		property("sonar.password", "67azasim")
 	}
 }
 
