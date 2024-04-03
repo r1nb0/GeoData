@@ -33,7 +33,7 @@ class CountryControllerTest {
         ResponseEntity<List<Country>> responseEntity = countryController
                 .getAll();
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -45,7 +45,7 @@ class CountryControllerTest {
 
         ResponseEntity<Optional<Country>> responseEntity = countryController
                 .findById(id);
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -53,7 +53,7 @@ class CountryControllerTest {
         ResponseEntity<Country> responseEntity = countryController
                 .addCountry(any(CountryDTO.class));
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -64,7 +64,7 @@ class CountryControllerTest {
         HttpStatus httpStatus = countryController
                 .deleteCountryById(id);
 
-        assertEquals(httpStatus, HttpStatus.OK);
+        assertEquals(HttpStatus.OK, httpStatus);
     }
 
     @Test
@@ -75,7 +75,7 @@ class CountryControllerTest {
         ResponseEntity<Country> responseEntity = countryController
                 .updateInfo(any(CountryDTO.class));
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -86,7 +86,7 @@ class CountryControllerTest {
         ResponseEntity<Country> responseEntity = countryController
                 .addLanguages(any(CountryDTO.class));
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -97,7 +97,7 @@ class CountryControllerTest {
         ResponseEntity<Country> responseEntity = countryController
                 .deleteLanguages(any(CountryDTO.class));
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
 }

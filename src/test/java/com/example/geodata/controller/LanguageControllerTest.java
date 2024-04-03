@@ -34,7 +34,7 @@ class LanguageControllerTest {
         ResponseEntity<List<Language>> responseEntity = languageController
                 .getAll();
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -48,7 +48,7 @@ class LanguageControllerTest {
         ResponseEntity<Optional<Language>> responseEntity = languageController
                 .getById(id);
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -56,7 +56,7 @@ class LanguageControllerTest {
         ResponseEntity<Language> responseEntity = languageController
                 .addLanguage(any(LanguageDTO.class));
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -65,7 +65,7 @@ class LanguageControllerTest {
         HttpStatus httpStatus = languageController
                 .deleteLanguage(anyInt());
 
-        assertEquals(httpStatus, HttpStatus.OK);
+        assertEquals(HttpStatus.OK, httpStatus);
     }
 
     @Test
@@ -74,6 +74,6 @@ class LanguageControllerTest {
         ResponseEntity<Language> responseEntity = languageController
                 .updateInfo(any(LanguageDTO.class));
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 }

@@ -280,11 +280,6 @@ class CountryServiceImplTest {
     }
 
     @Test
-    void deleteLanguage() {
-
-    }
-
-    @Test
     void updateInfo_invalidId() {
         CountryDTO countryDTO = CountryDTO.builder()
                 .id(1)
@@ -340,11 +335,6 @@ class CountryServiceImplTest {
 
         assertThrows(BadRequestException.class,
                 () -> countryService.updateInfo(countryDTO));
-    }
-
-    @Test
-    void findCountriesWithSpecifiedLanguage() {
-
     }
 
     @Test

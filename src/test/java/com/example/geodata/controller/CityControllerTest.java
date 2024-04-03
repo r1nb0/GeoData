@@ -33,7 +33,7 @@ class CityControllerTest {
         ResponseEntity<List<City>> responseEntity = cityController
                 .getAll();
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -67,7 +67,7 @@ class CityControllerTest {
         ResponseEntity<City> responseEntity = cityController
                 .addCity(cityDTO);
 
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
@@ -77,7 +77,7 @@ class CityControllerTest {
 
         HttpStatus httpStatus = cityController.deleteCityById(id);
 
-        assertEquals(httpStatus, HttpStatus.OK);
+        assertEquals(HttpStatus.OK, httpStatus);
     }
 
     @Test
@@ -92,8 +92,8 @@ class CityControllerTest {
         ResponseEntity<City> responseEntity = cityController
                 .changeCountry(cityDTO);
 
-        assertEquals(responseEntity.getStatusCode(),
-                HttpStatus.OK);
+        assertEquals(HttpStatus.OK,
+                responseEntity.getStatusCode());
     }
 
     @Test
@@ -107,8 +107,8 @@ class CityControllerTest {
         ResponseEntity<City> responseEntity = cityController
                 .updateInfo(cityDTO);
 
-        assertEquals(responseEntity.getStatusCode(),
-                HttpStatus.OK);
+        assertEquals(HttpStatus.OK,
+                responseEntity.getStatusCode());
     }
 
 }
