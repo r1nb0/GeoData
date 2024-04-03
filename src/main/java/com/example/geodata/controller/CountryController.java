@@ -23,8 +23,8 @@ public class CountryController {
     private final CountryService countryService;
 
     @GetMapping("/all")
-    public List<Country> getAll() {
-        return countryService.getAll();
+    public ResponseEntity<List<Country>> getAll() {
+        return ResponseEntity.ok(countryService.getAll());
     }
 
     @GetMapping("/info/{id}")
@@ -42,9 +42,6 @@ public class CountryController {
             @RequestBody final CountryDTO countryDTO
     ) {
         Country country = countryService.createCountry(countryDTO);
-        if (country == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
         return new ResponseEntity<>(country, HttpStatus.OK);
     }
 

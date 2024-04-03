@@ -64,7 +64,7 @@ public class LanguageController {
 
     @PostMapping("/bulkInsert")
     @AspectAnnotation
-    void bulkInsert(@RequestBody final List<LanguageDTO> languageDTOS) {
+    public void bulkInsert(@RequestBody final List<LanguageDTO> languageDTOS) {
         languageService.bulkInsert(languageDTOS);
     }
 

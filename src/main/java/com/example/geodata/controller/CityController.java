@@ -23,8 +23,8 @@ public class CityController {
     private final CityService cityService;
 
     @GetMapping("/all")
-    public List<City> getAll() {
-        return cityService.getAll();
+    public ResponseEntity<List<City>> getAll() {
+        return ResponseEntity.ok(cityService.getAll());
     }
 
     @GetMapping("/info/{cityId}")
