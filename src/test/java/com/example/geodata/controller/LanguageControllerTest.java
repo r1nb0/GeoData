@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,5 +76,13 @@ class LanguageControllerTest {
                 .updateInfo(any(LanguageDTO.class));
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void bulkInsert() {
+        HttpStatus httpStatus = languageController
+                .bulkInsert(new ArrayList<>());
+
+        assertEquals(httpStatus, HttpStatus.OK);
     }
 }

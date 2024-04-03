@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,6 +99,14 @@ class CountryControllerTest {
                 .deleteLanguages(any(CountryDTO.class));
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void bulkInsert() {
+        HttpStatus httpStatus = countryController
+                .bulkInsert(new ArrayList<>());
+
+        assertEquals(httpStatus, HttpStatus.OK);
     }
 
 }
