@@ -33,6 +33,7 @@ public class CountryController {
             @PathVariable final Integer id
     )
             throws ResourceNotFoundException {
+
         return ResponseEntity.ok(countryService.findById(id));
     }
 

@@ -1,12 +1,10 @@
 package com.example.geodata.aspects;
 
+import com.example.geodata.service.CounterService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -23,9 +21,23 @@ public class LoggingAspect {
 
     }
 
+    @Pointcut("within(com.example.geodata.service..*)")
+    public void serviceMethods() {
+
+    }
+
     @Pointcut("@annotation(AspectAnnotation)")
     public void methodsWithAspectAnnotation() {
 
+    }
+
+    @Before("serviceMethods()")
+    public void logCounterService(final JoinPoint joinPoint) {
+        int requestCounter = CounterService.increment();
+        log.info("Increment counter from {}.{}()."
+                        + " Current value of counter is {}", joinPoint
+                        .getSignature().getDeclaringTypeName(),
+                joinPoint.getSignature().getName(), requestCounter);
     }
 
     @Around("methodsWithAspectAnnotation()")
