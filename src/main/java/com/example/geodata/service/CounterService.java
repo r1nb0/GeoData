@@ -1,10 +1,9 @@
 package com.example.geodata.service;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CounterService {
 
-    public CounterService() { }
+    private CounterService() { }
 
     private static final AtomicInteger count = new AtomicInteger(0);
 

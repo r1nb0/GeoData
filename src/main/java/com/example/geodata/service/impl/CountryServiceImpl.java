@@ -47,15 +47,8 @@ public class CountryServiceImpl implements CountryService {
     @AspectAnnotation
     public Optional<Country> findById(final Integer id)
             throws ResourceNotFoundException {
-        Optional<Country> country = countryCache.get(id);
-        if (country.isEmpty()) {
-            country = countryRepository.findById(id);
-            if (country.isEmpty()) {
-                throw new ResourceNotFoundException(NO_EXIST + " " + id);
-            }
-            countryCache.put(id, country.get());
-        }
-        return country;
+        //Optional<Country> country = countryCache.get(id);
+        return countryRepository.findById(id);
     }
 
     @Override

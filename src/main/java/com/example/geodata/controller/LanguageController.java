@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin
 @Tag(name = "LanguageController")
 @RestController
 @RequestMapping("/api/v1/languages")
@@ -68,6 +69,5 @@ public class LanguageController {
         languageService.bulkInsert(languageDTOS);
         return HttpStatus.OK;
     }
-
 
 }
