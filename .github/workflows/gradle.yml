@@ -32,19 +32,6 @@ jobs:
           name: my-app
           path: build/libs/*.jar 
           
-    - name: Move JAR to target folder
-      run: |
-        mkdir -p target
-        mv build/libs/*.jar target/
-
-    - name: Push JAR file to repository
-      run: |
-        git config --global user.name 'GitHub Actions'
-        git config --global user.email 'github-actions@github.com'
-        git add target/*.jar
-        git commit -m "Add build artifact"
-        git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/r1nb0/GeoData.git
-
   release-project:
     name: "Release project"
     runs-on: ubuntu-latest
