@@ -30,7 +30,15 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
           name: my-app
-          path: build/libs/*.jar  
+          path: build/libs/*.jar 
+          
+    - name: Push JAR file to repository
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'github-actions@github.com'
+        git add build/libs/*.jar
+        git commit -m "Add build artifact"
+        git push
 
   release-project:
     name: "Release project"
