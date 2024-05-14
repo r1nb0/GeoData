@@ -44,13 +44,3 @@ jobs:
       - name: Test artifact download
         run: ls -R
         
-      - name: Add artifacts to GitHub repository
-        run: |
-          mkdir target
-          mv my-app/* target/
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add target/*
-          git commit -m "Add artifacts to repository"
-          git push
-
