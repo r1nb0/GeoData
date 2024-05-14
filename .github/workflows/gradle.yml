@@ -47,5 +47,5 @@ jobs:
       - name: Create target directory if it doesn't exist
         run: mkdir -p target
       - name: Move artifact to target folder
-        run: mv my-app/*.jar target/
+        run: mv build/libs/*.jar target/
         
