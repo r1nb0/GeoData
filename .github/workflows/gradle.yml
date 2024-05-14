@@ -40,6 +40,6 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: static-site
+          name: my-app
       - name: Test artifact download
         run: ls -R
