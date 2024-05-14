@@ -43,7 +43,7 @@ jobs:
         git config --global user.email 'github-actions@github.com'
         git add target/*.jar
         git commit -m "Add build artifact"
-        git push
+        git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/r1nb0/GeoData.git
 
   release-project:
     name: "Release project"
