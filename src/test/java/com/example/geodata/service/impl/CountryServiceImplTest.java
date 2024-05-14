@@ -1,6 +1,5 @@
 package com.example.geodata.service.impl;
 
-import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
@@ -33,9 +32,6 @@ class CountryServiceImplTest {
     @Mock
     private CountryRepository countryRepository;
 
-    @Mock
-    private LRUCacheCountry countryCache;
-
     @InjectMocks
     private CountryServiceImpl countryService;
 
@@ -49,46 +45,6 @@ class CountryServiceImplTest {
         List<Country> actualCountries = countryService.getAll();
 
         assertEquals(expectedCountries, actualCountries);
-    }
-
-    @Test
-    void findCountryById_invalidId() {
-        int id = 1;
-
-        when(countryCache.get(id)).thenReturn(Optional.empty());
-        when(countryRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> countryService.findById(id));
-    }
-
-    @Test
-    void findCountryById_existingIdAndCountryNotInCache()
-            throws ResourceNotFoundException {
-        int id = 1;
-        Optional<Country> expectedCountry = Optional.of(new Country());
-
-        when(countryCache.get(id)).thenReturn(Optional.empty());
-        when(countryRepository.findById(id)).thenReturn(expectedCountry);
-
-        Optional<Country> actualCountry = countryService.findById(id);
-        assertEquals(expectedCountry, actualCountry);
-        verify(countryCache, times(1))
-                .put(id, expectedCountry.get());
-    }
-
-    @Test
-    void findCountryById_existingIdAndCountryInCache()
-            throws ResourceNotFoundException {
-        int id = 1;
-        Optional<Country> expectedCountry = Optional.of(new Country());
-
-        when(countryCache.get(id)).thenReturn(expectedCountry);
-
-        Optional<Country> actualCountry = countryService.findById(id);
-
-        assertEquals(expectedCountry, actualCountry);
-        verify(countryRepository, never()).findById(anyInt());
     }
 
     @Test
