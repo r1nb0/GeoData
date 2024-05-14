@@ -43,7 +43,6 @@ jobs:
           name: my-app
       - name: Test artifact download
         run: ls -R
-
       - name: Create target directory if it doesn't exist
         run: mkdir -p target
       - name: Move artifact to target folder
