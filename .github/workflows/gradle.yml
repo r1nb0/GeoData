@@ -45,6 +45,4 @@ jobs:
       - name: Test artifact download
         run: ls -R
       - name: Create target directory
-        run: mkdir -p my-target-directory
-      - name: Copy artifact to target directory
-        run: cp /home/runner/work/GeoData/GeoData/my-app/* my-target-directory/
+        run: mkdir -p target
