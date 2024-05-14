@@ -13,11 +13,14 @@ services:
       interval: 1s
       timeout: 5s
       retries: 10
+    volumes:
+      - 59f7f374b08ce247c3f17d45eae5b13f54c1d317efc6df1f8a3d1d79e522d2ea:/var/lib/postgresql/data
     restart: always
     ports:
       - "5432:5432"
   client-backend:
-    image: client:0.0.1
+    image: geo_data_backend
+    container_name: backend
     build:
       context: .
       dockerfile: Dockerfile
@@ -32,3 +35,18 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
+  client-frontend:
+    image: geo_data_frontend
+    container_name: frontend
+    build:
+      context: C:\Users\limbo\WebstormProjects\geo
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - client-backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  59f7f374b08ce247c3f17d45eae5b13f54c1d317efc6df1f8a3d1d79e522d2ea:
+    external: true
