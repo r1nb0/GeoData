@@ -36,4 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 
+gradlew.bat
+gradlew
+gradle/wrapper/
+settings.gradle
 .env
