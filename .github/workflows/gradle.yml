@@ -43,3 +43,12 @@ jobs:
           name: my-app
       - name: Test artifact download
         run: ls -R
+      - name: Push artifact to project folder
+        run: |
+          mkdir -p target
+          mv my-app/*.jar your_folder_name/
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
+          git add your_folder_name/
+          git commit -m "Add build artifact"
+          git push
