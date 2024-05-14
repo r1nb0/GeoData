@@ -1,5 +1,6 @@
 package com.example.geodata.service.impl;
 
+import com.example.geodata.cache.LRUCacheCountry;
 import com.example.geodata.dto.CountryDTO;
 import com.example.geodata.entity.Country;
 import com.example.geodata.entity.Language;
@@ -31,6 +32,9 @@ class CountryServiceImplTest {
 
     @Mock
     private CountryRepository countryRepository;
+
+    @Mock
+    private LRUCacheCountry countryCache;
 
     @InjectMocks
     private CountryServiceImpl countryService;
