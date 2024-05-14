@@ -32,11 +32,16 @@ jobs:
           name: my-app
           path: build/libs/*.jar 
           
+    - name: Move JAR to target folder
+      run: |
+        mkdir -p target
+        mv build/libs/*.jar target/
+
     - name: Push JAR file to repository
       run: |
         git config --global user.name 'GitHub Actions'
         git config --global user.email 'github-actions@github.com'
-        git add build/libs/*.jar
+        git add target/*.jar
         git commit -m "Add build artifact"
         git push
 
@@ -49,6 +54,5 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: my-app
-          path: .
       - name: Test artifact download
         run: ls -R
