@@ -42,31 +42,5 @@ jobs:
         with:
           name: my-app
           path: .
-
       - name: Test artifact download
         run: ls -R
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Move artifact to repo
-        run: |
-          mkdir -p my-repo-folder
-          mv my-app/*.jar my-repo-folder/
-
-      - name: Commit changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add my-repo-folder/*.jar
-          git commit -m "Add downloaded artifact"
-
-      - name: Push changes
-        uses: pascalgn/automerge-action@latest
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          merge-method: merge
-          merge-message: "Merge pull request for artifact"
-          merge-commit-message: "Merge pull request for artifact"
-          merge-pull-request-title: "Merge pull request for artifact"
-          merge-pull-request-description: "Merge pull request for artifact"
