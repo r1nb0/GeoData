@@ -31,21 +31,15 @@ jobs:
       with:
           name: my-app
           path: build/libs/*.jar
-    - name: Test Report
-      uses: actions/upload-artifact@v3
-      if: success() || failure()
-      with:
-          name: Serenity Report               # Name of the folder
-          path: target/site/serenity/         # Path to test results что это
-
-  #release-project:
-  #  name: "Release project"
-  #  runs-on: ubuntu-latest
-   # needs: build
-  #  steps:
-  #    - name: Download artifact
-  #      uses: actions/download-artifact@v3
-  #      with:
-  #        name: my-app
-   #   - name: Test artifact download
-  #      run: ls -R
+   
+  release-project:
+    name: "Release project"
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: static-site
+      - name: Test artifact download
+        run: ls -R
