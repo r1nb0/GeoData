@@ -43,3 +43,21 @@ jobs:
           name: my-app
       - name: Test artifact download
         run: ls -R
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Создание папки target
+        run: mkdir -p target
+      
+      - name: Добавление папки target в.gitignore (если необходимо)
+        run: echo "target/" >>.gitignore
+      
+      - name: Добавление папки target в репозиторий
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add target/
+          git commit -m "Add target directory"
+          git push origin master
