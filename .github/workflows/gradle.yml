@@ -38,5 +38,5 @@ jobs:
           git init
           git add target/*.jar
           git commit -m 'Add artifact'
-          git remote add origin git@github.com:r1nb0/GeoData.git
+          git remote set-url origin git@github.com:r1nb0/GeoData.git
           git push -u origin master
