@@ -26,7 +26,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Добавление папки target в репозиторий
+      - name: Release jar files on github
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
