@@ -26,17 +26,20 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Create target directory and copy jar files
-        run: |
-          mkdir -p target
-          cp build/libs/*.jar target/
-      
-      - name: Push artifact to GitHub repository
-        run: |
-          git config --global user.name 'r1nb0'
-          git config --global user.email 'ilia.mesha12@gmail.com'
-          git init
-          git add target/*.jar
-          git commit -m 'Add artifact'
-          git remote set-url origin git@github.com:r1nb0/GeoData.git
-          git push -u origin master
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: my-app
+          path: build/libs/*.jar
+
+  release-project:
+    name: "Release project"
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: my-app
+      - name: Test artifact download
+        run: ls -R
