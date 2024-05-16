@@ -3,7 +3,7 @@ name: Java CI with Gradle
 on:
   push:
     branches: [ master ]
-  pull_request:
+  pull_request:A
     branches: [ master ]
 
 jobs:
@@ -43,11 +43,3 @@ jobs:
           name: my-app
       - name: Test artifact download
         run: ls -R
-        
-      - name: Push artifact to GitHub
-        run: |
-          git config --global user.email "ilia.mesha12@gmail.com"
-          git config --global user.name "r1nb0"
-          git add build/libs/*.jar
-          git commit -m "Add latest artifact"
-          git push origin master
