@@ -51,9 +51,6 @@ jobs:
       - name: Создание папки target
         run: mkdir -p target
       
-      - name: Добавление папки target в.gitignore (если необходимо)
-        run: echo "target/" >>.gitignore
-      
       - name: Добавление папки target в репозиторий
         run: |
           git config --global user.email "action@github.com"
