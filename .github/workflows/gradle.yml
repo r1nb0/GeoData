@@ -26,23 +26,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: my-app
-          path: build/libs/*.jar
-
-  release-project:
-    name: "Release project"
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Push artifact to GitHub repository
         run: |
           git config --global user.name 'r1nb0'
           git config --global user.email 'ilia.mesha12@gmail.com'
           git init
-          git add my-app/*.jar
+          git add build/libs/*.jar
           git commit -m 'Add artifact'
           git remote add origin git@github.com:r1nb0/GeoData.git
           git push -u origin master
+
+
