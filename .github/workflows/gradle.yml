@@ -30,7 +30,7 @@ jobs:
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          git add -f build/libs/GeoData-0.0.1-SNAPSHOT.jar
+          git add -f build/libs/*.jar
           git commit -m "Add target directory"
           git push origin master
 
