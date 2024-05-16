@@ -43,3 +43,10 @@ jobs:
           name: my-app
       - name: Test artifact download
         run: ls -R
+      - name: Push JAR files to repository
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add build/libs/*.jar
+          git commit -m "Update JAR files" || echo "No changes to commit."
+          git push origin master
