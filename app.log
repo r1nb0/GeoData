@@ -1,0 +1,3 @@
+2024-05-16 19:08:47.381 [Test worker] INFO  c.e.geodata.GeoDataApplicationTests - Starting GeoDataApplicationTests using Java 17.0.11 with PID 1889 (started by runner in /home/runner/work/GeoData/GeoData)
+2024-05-16 19:08:47.389 [Test worker] INFO  c.e.geodata.GeoDataApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2024-05-16 19:08:47.712 [Test worker] INFO  c.e.geodata.GeoDataApplicationTests - Started GeoDataApplicationTests in 0.687 seconds (process running for 2.521)
