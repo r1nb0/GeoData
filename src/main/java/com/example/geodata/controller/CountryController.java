@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin
+@CrossOrigin(origins = {"https://geodata-production.up.railway.app/"})
 @Tag(name = "CountryController")
 @RestController
 @RequestMapping("/api/v1/countries")
