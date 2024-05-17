@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = {"https://geodata-production.up.railway.app/"})
+@CrossOrigin(origins = {"http://localhost:3000", "https://geo-client-rouge.vercel.app/"})
 @Tag(name = "LanguageController")
 @RestController
 @RequestMapping("/api/v1/languages")
