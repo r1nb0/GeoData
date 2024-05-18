@@ -40,6 +40,12 @@ jobs:
           name: my-app
           path: build/libs/*.jar
 
+      - name: Deploy to Railway
+        uses: railway/railway-action@master
+        with:
+          api-token: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
+          env: production
+
   release-project:
     name: "Release project"
     runs-on: ubuntu-latest
