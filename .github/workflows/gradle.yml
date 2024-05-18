@@ -34,12 +34,6 @@ jobs:
           git commit -m "Add target directory"
           git push origin master
 
-      - name: Railway deploy
-        run: |
-          railway login --token RAILWAY_PROJECT_TOKEN
-          railway link
-          railway up
-
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
