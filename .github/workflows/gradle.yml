@@ -40,17 +40,6 @@ jobs:
           name: my-app
           path: build/libs/*.jar
 
-      - name: Install Railway CLI
-        run: curl -fsSL https://cli.railway.app/install.sh | bash
-
-      - name: Login to Railway
-        run: echo "${{ secrets.RAILWAY_PROJECT_TOKEN }}" | railway login
-
-      - name: Deploy
-        run: railway up
-        env:
-          RAILWAY_PROJECT_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
-
   release-project:
     name: "Release project"
     runs-on: ubuntu-latest
