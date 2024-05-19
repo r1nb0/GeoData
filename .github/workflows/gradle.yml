@@ -26,14 +26,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Release jar files on github
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add -f build/libs/*.jar
-          git commit -m "Add target directory"
-          git push origin master
-
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
