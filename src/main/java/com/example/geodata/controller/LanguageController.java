@@ -45,7 +45,7 @@ public class LanguageController {
                 HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{idLanguage}")
+    @DeleteMappinga("/delete/{idLanguage}")
     @AspectAnnotation
     public HttpStatus deleteLanguage(@PathVariable final Integer idLanguage)
             throws ResourceNotFoundException {
